@@ -1,0 +1,94 @@
+﻿import { apiRequest } from "@/lib/api/client";
+import type {
+  HomeResponse,
+  LoginPayload,
+  LoginResponse,
+  MatchDetails,
+  NewsArticle,
+  RedirectCampaign,
+  RedirectCampaignListResponse,
+  RedirectCampaignPayload,
+  RedirectConfig,
+  RedirectSettings,
+  StreamLink,
+  StreamListResponse,
+} from "@/lib/api/types";
+
+export function getHomePageData(locale: string) {
+  return apiRequest<HomeResponse>(`/api/v1/home?locale=${locale}`);
+}
+
+export function getMatchDetails(matchId: string, locale: string) {
+  return apiRequest<MatchDetails>(`/api/v1/matches/${encodeURIComponent(matchId)}?locale=${locale}`);
+}
+
+export function getNewsArticle(newsSlug: string, locale: string) {
+  return apiRequest<NewsArticle>(`/api/v1/news/${encodeURIComponent(newsSlug)}?locale=${locale}`);
+}
+
+export function getRedirectConfig() {
+  return apiRequest<RedirectConfig>("/api/v1/redirect/config");
+}
+
+export function loginAdmin(payload: LoginPayload) {
+  return apiRequest<LoginResponse>("/api/v1/auth/login", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getStreams(token: string) {
+  return apiRequest<StreamListResponse>("/api/v1/admin/streams", { token });
+}
+
+export function getStream(externalId: string, token: string) {
+  return apiRequest<StreamLink>(`/api/v1/admin/streams/${encodeURIComponent(externalId)}`, { token });
+}
+
+export function createStream(payload: StreamLink, token: string) {
+  return apiRequest<StreamLink>("/api/v1/admin/streams", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    token,
+  });
+}
+
+export function updateStream(externalId: string, payload: Omit<StreamLink, "external_match_id">, token: string) {
+  return apiRequest<StreamLink>(`/api/v1/admin/streams/${encodeURIComponent(externalId)}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    token,
+  });
+}
+
+export function getRedirects(token: string) {
+  return apiRequest<RedirectCampaignListResponse>("/api/v1/admin/redirects", { token });
+}
+
+export function createRedirect(payload: RedirectCampaignPayload, token: string) {
+  return apiRequest<RedirectCampaign>("/api/v1/admin/redirects", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    token,
+  });
+}
+
+export function updateRedirect(redirectId: string, payload: RedirectCampaignPayload, token: string) {
+  return apiRequest<RedirectCampaign>(`/api/v1/admin/redirects/${redirectId}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    token,
+  });
+}
+
+export function getRedirectSettings(token: string) {
+  return apiRequest<RedirectSettings>("/api/v1/admin/redirect-settings", { token });
+}
+
+export function updateRedirectSettings(payload: RedirectSettings, token: string) {
+  return apiRequest<RedirectSettings>("/api/v1/admin/redirect-settings", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+    token,
+  });
+}

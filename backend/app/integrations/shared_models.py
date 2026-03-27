@@ -1,0 +1,30 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from datetime import datetime
+
+
+@dataclass(slots=True)
+class MatchData:
+    external_match_id: str
+    competition_name: str
+    home_team: str
+    away_team: str
+    start_time: datetime
+    status: str
+    venue: str | None = None
+    description: str | None = None
+
+
+@dataclass(slots=True)
+class NewsArticleData:
+    slug: str
+    provider_id: str
+    title: str
+    summary: str
+    content: str
+    source: str
+    published_at: datetime
+    article_url: str
+    image_url: str | None = None
+    tags: list[str] = field(default_factory=list)
