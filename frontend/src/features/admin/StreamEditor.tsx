@@ -5,13 +5,15 @@ import { useRouter } from "next/navigation";
 
 import type { Locale, Messages } from "@/i18n";
 import { getAdminToken } from "@/lib/auth";
-import { createStream, getStream, updateStream } from "@/lib/api";
+import { createStream, getHomePageData, getStream, updateStream } from "@/lib/api";
+import type { HomeResponse } from "@/lib/api/types";
 
 import { StreamForm, type StreamFormValues } from "./StreamForm";
 
 export function StreamEditor({ locale, messages, externalId }: { locale: Locale; messages: Messages; externalId?: string }) {
   const router = useRouter();
   const [initialValues, setInitialValues] = useState<StreamFormValues | undefined>(undefined);
+  const [matchBuckets, setMatchBuckets] = useState<HomeResponse | null>(null);
   const [loading, setLoading] = useState(Boolean(externalId));
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +37,12 @@ export function StreamEditor({ locale, messages, externalId }: { locale: Locale;
       .finally(() => setLoading(false));
   }, [externalId, messages.loadFailed]);
 
+  useEffect(() => {
+    getHomePageData(locale)
+      .then((response) => setMatchBuckets(response))
+      .catch(() => setMatchBuckets(null));
+  }, [locale]);
+
   if (loading) {
     return <div className="text-[#f4bb41]">{messages.loading}</div>;
   }
@@ -48,6 +56,11 @@ export function StreamEditor({ locale, messages, externalId }: { locale: Locale;
       messages={messages}
       initialValues={initialValues}
       mode={externalId ? "edit" : "create"}
+      matchBuckets={matchBuckets ? [
+        { label: messages.todayMatches, matches: matchBuckets.today_matches },
+        { label: messages.tomorrowMatches, matches: matchBuckets.tomorrow_matches },
+        { label: messages.yesterdayMatches, matches: matchBuckets.yesterday_matches },
+      ] : undefined}
       onSubmit={async (values) => {
         const token = getAdminToken();
         if (!token) {

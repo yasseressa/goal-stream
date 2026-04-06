@@ -45,6 +45,11 @@ class RedirectSettingUpdate(BaseModel):
     default_cooldown_seconds: int = Field(ge=0, le=86400)
     open_in_new_tab: bool = False
     fallback_url: str | None = Field(default=None, max_length=2048)
+    facebook_url: str | None = Field(default=None, max_length=2048)
+    youtube_url: str | None = Field(default=None, max_length=2048)
+    instagram_url: str | None = Field(default=None, max_length=2048)
+    telegram_url: str | None = Field(default=None, max_length=2048)
+    whatsapp_url: str | None = Field(default=None, max_length=2048)
     active_campaign_id: str | None = None
 
 
@@ -55,6 +60,11 @@ class RedirectSettingResponse(BaseModel):
     default_cooldown_seconds: int
     open_in_new_tab: bool
     fallback_url: str | None
+    facebook_url: str | None
+    youtube_url: str | None
+    instagram_url: str | None
+    telegram_url: str | None
+    whatsapp_url: str | None
     active_campaign_id: str | None
     created_at: datetime
     updated_at: datetime
@@ -65,3 +75,12 @@ class RedirectConfigResponse(BaseModel):
     interval_seconds: int
     target_url: str | None
     open_in_new_tab: bool
+
+
+class SocialLinkItem(BaseModel):
+    label: str
+    href: str
+
+
+class SocialLinksResponse(BaseModel):
+    items: list[SocialLinkItem]

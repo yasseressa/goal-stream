@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import type { Messages } from "@/i18n";
-import type { StreamLink } from "@/lib/api/types";
+import type { MatchSummary, StreamLink } from "@/lib/api/types";
 
 export interface StreamFormValues {
   external_match_id: string;
@@ -21,11 +21,13 @@ export function StreamForm({
   initialValues,
   onSubmit,
   mode,
+  matchBuckets,
 }: {
   messages: Messages;
   initialValues?: StreamFormValues;
   onSubmit: (values: StreamFormValues) => Promise<void>;
   mode: "create" | "edit";
+  matchBuckets?: Array<{ label: string; matches: MatchSummary[] }>;
 }) {
   const [values, setValues] = useState<StreamFormValues>(
     initialValues ?? {
@@ -75,10 +77,10 @@ export function StreamForm({
           onChange={(event) => setValues((current) => ({ ...current, stream_type: event.target.value as StreamLink["stream_type"] }))}
           data-disable-global-redirect
         >
-          <option value="iframe">IFRAME</option>
-          <option value="external">EXTERNAL</option>
-          <option value="embed">EMBED</option>
-          <option value="hls">HLS</option>
+          <option value="iframe">{messages.streamTypeIframe}</option>
+          <option value="external">{messages.streamTypeExternal}</option>
+          <option value="embed">{messages.streamTypeEmbed}</option>
+          <option value="hls">{messages.streamTypeHls}</option>
         </Select>
         <label className="flex items-center gap-3 text-sm font-semibold text-[#f5efe3]">
           <input
@@ -92,6 +94,41 @@ export function StreamForm({
         {error ? <p className="text-sm text-[#f5d7c9]">{error}</p> : null}
         <Button type="submit" disabled={loading}>{loading ? messages.loading : mode === "create" ? messages.save : messages.update}</Button>
       </form>
+      {matchBuckets?.some((bucket) => bucket.matches.length > 0) ? (
+        <div className="space-y-4 border-t border-[#3a2b14] pt-5">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[#f4bb41]">{messages.availableMatches}</p>
+            <p className="mt-2 text-sm text-[#ccb992]">{messages.pickMatchIdHelp}</p>
+          </div>
+          <div className="space-y-4">
+            {matchBuckets.map((bucket) =>
+              bucket.matches.length > 0 ? (
+                <div key={bucket.label} className="space-y-3">
+                  <p className="text-sm font-semibold text-[#f7f0e2]">{bucket.label}</p>
+                  <div className="space-y-2">
+                    {bucket.matches.map((match) => (
+                      <div key={match.external_match_id} className="flex flex-col gap-3 rounded-[1.25rem] border border-[#3a2b14] bg-[#17120d] p-4 md:flex-row md:items-center md:justify-between">
+                        <div className="space-y-1">
+                          <p className="font-semibold text-[#f7f0e2]">{match.home_team} {messages.versus} {match.away_team}</p>
+                          <p className="text-sm text-[#ccb992]">{match.competition_name}</p>
+                          <p className="text-xs text-[#f4bb41]">{messages.matchId}: {match.external_match_id}</p>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => setValues((current) => ({ ...current, external_match_id: match.external_match_id }))}
+                        >
+                          {messages.useMatchId}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null,
+            )}
+          </div>
+        </div>
+      ) : null}
     </Card>
   );
 }

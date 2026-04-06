@@ -9,7 +9,14 @@ from app.core.cache import CacheBackend, CacheKeys
 from app.core.config import settings
 from app.repositories.redirect_campaign import RedirectCampaignRepository
 from app.repositories.redirect_setting import RedirectSettingRepository
-from app.schemas.redirect import RedirectCampaignCreate, RedirectCampaignUpdate, RedirectConfigResponse, RedirectSettingUpdate
+from app.schemas.redirect import (
+    RedirectCampaignCreate,
+    RedirectCampaignUpdate,
+    RedirectConfigResponse,
+    RedirectSettingUpdate,
+    SocialLinkItem,
+    SocialLinksResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,6 +56,11 @@ class RedirectService:
                 default_cooldown_seconds=30,
                 open_in_new_tab=False,
                 fallback_url=None,
+                facebook_url=None,
+                youtube_url=None,
+                instagram_url=None,
+                telegram_url=None,
+                whatsapp_url=None,
                 active_campaign_id=None,
             )
             settings_row = await self.setting_repository.upsert(payload)
@@ -86,3 +98,15 @@ class RedirectService:
         self.cache.set(cache_key, config, settings.cache_redirect_config_ttl_seconds)
         logger.info("redirect_config_loaded", extra={"enabled": config.enabled})
         return config
+
+    async def get_public_social_links(self) -> SocialLinksResponse:
+        settings_row = await self.get_settings()
+        raw_items = [
+            ("Facebook", settings_row.facebook_url),
+            ("YouTube", settings_row.youtube_url),
+            ("Instagram", settings_row.instagram_url),
+            ("Telegram", settings_row.telegram_url),
+            ("WhatsApp", settings_row.whatsapp_url),
+        ]
+        items = [SocialLinkItem(label=label, href=href) for label, href in raw_items if href]
+        return SocialLinksResponse(items=items)

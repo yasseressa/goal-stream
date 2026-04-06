@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { MatchDetailsView } from "@/features/matches/MatchDetailsView";
 import { getMessages, isLocale } from "@/i18n";
 import { getMatchDetails } from "@/lib/api";
+import { ApiError } from "@/lib/api/client";
 
 export default async function MatchPage({
   params,
@@ -15,7 +16,15 @@ export default async function MatchPage({
   }
 
   const matchId = decodeURIComponent(matchSlug);
-  const [messages, data] = await Promise.all([getMessages(locale), getMatchDetails(matchId, locale)]);
+  const messages = await getMessages(locale);
 
-  return <MatchDetailsView locale={locale} messages={messages} match={data} />;
+  try {
+    const data = await getMatchDetails(matchId, locale);
+    return <MatchDetailsView locale={locale} messages={messages} match={data} />;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) {
+      notFound();
+    }
+    throw error;
+  }
 }

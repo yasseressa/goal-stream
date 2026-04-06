@@ -12,7 +12,13 @@ export function MatchPlayer({ stream, canShowPlayer, messages }: { stream?: Stre
   if (stream.stream_type === "iframe" || stream.stream_type === "embed") {
     return (
       <div className="overflow-hidden rounded-[1.5rem] border border-[#4b3818] bg-[#0d0d0d] shadow-card">
-        <iframe src={stream.stream_url} className="aspect-video w-full" allowFullScreen title="Match Player" />
+        <iframe
+          src={stream.stream_url}
+          className="aspect-video w-full"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+          title={messages.playerTitle}
+        />
       </div>
     );
   }

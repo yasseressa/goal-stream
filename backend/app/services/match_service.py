@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheBackend, CacheKeys
+from app.core.config import settings
 from app.core.constants import MATCH_DETAILS_CACHE_TTL_SECONDS
 from app.integrations.shared_models import MatchData, NewsArticleData
 from app.integrations.sports.client import SportsAPIClient
@@ -14,6 +16,7 @@ from app.repositories.stream_link import StreamLinkRepository
 from app.services.news_service import NewsService
 
 logger = logging.getLogger(__name__)
+KSA_TIMEZONE = ZoneInfo(settings.football_data_timezone)
 
 
 class MatchService:
@@ -46,7 +49,7 @@ class MatchService:
         if cached is not None:
             return cached
 
-        match = await self.sports_client.get_match_details(match_id, locale)
+        match = await self._find_match_from_home_buckets(match_id, locale)
         if match is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Match not found")
 
@@ -54,10 +57,25 @@ class MatchService:
         return match
 
     def _can_show_player(self, match: MatchData, stream_link) -> bool:
-        today = datetime.now(UTC).date()
         return bool(
-            match.start_time.date() == today
-            and stream_link is not None
+            stream_link is not None
             and stream_link.show_stream
             and stream_link.stream_url
         )
+
+    async def _find_match_from_home_buckets(self, match_id: str, locale: str) -> MatchData | None:
+        today = datetime.now(KSA_TIMEZONE).date()
+        buckets = (
+            ("yesterday", today - timedelta(days=1)),
+            ("today", today),
+            ("tomorrow", today + timedelta(days=1)),
+        )
+        for bucket, target_date in buckets:
+            matches = self.cache.get(CacheKeys.home_matches(locale, bucket))
+            if matches is None:
+                matches = await self.sports_client.get_matches_for_date(target_date, locale)
+                self.cache.set(CacheKeys.home_matches(locale, bucket), matches, MATCH_DETAILS_CACHE_TTL_SECONDS)
+            for match in matches:
+                if match.external_match_id == match_id:
+                    return match
+        return None

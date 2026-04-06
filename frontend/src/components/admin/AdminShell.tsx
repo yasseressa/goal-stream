@@ -30,9 +30,10 @@ export function AdminShell({ children, locale, messages }: { children: React.Rea
       { href: `/${locale}/admin`, label: messages.dashboard },
       { href: `/${locale}/admin/streams`, label: messages.streamLinks },
       { href: `/${locale}/admin/redirects`, label: messages.redirects },
+      { href: `/${locale}/admin/socials`, label: messages.socialLinks },
       { href: `/${locale}`, label: messages.publicSite },
     ],
-    [locale, messages.dashboard, messages.publicSite, messages.redirects, messages.streamLinks],
+    [locale, messages.dashboard, messages.publicSite, messages.redirects, messages.socialLinks, messages.streamLinks],
   );
 
   if (isLoginPage) {

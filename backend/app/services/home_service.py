@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 from app.core.cache import CacheBackend, CacheKeys
+from app.core.config import settings
 from app.core.constants import HOME_MATCHES_CACHE_TTL_SECONDS
 from app.integrations.shared_models import MatchData, NewsArticleData
 from app.integrations.sports.client import SportsAPIClient
 from app.services.news_service import NewsService
 
 logger = logging.getLogger(__name__)
+KSA_TIMEZONE = ZoneInfo(settings.football_data_timezone)
 
 
 class HomeService:
@@ -19,7 +22,7 @@ class HomeService:
         self.cache = cache
 
     async def get_home_data(self, locale: str) -> dict[str, list[MatchData] | list[NewsArticleData]]:
-        today = datetime.now(UTC).date()
+        today = datetime.now(KSA_TIMEZONE).date()
         yesterday_matches = await self._get_matches_for_bucket(today - timedelta(days=1), locale, "yesterday")
         today_matches = await self._get_matches_for_bucket(today, locale, "today")
         tomorrow_matches = await self._get_matches_for_bucket(today + timedelta(days=1), locale, "tomorrow")

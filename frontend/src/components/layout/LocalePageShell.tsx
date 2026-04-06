@@ -24,10 +24,10 @@ export function LocalePageShell({
   }
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-[#050505]">
       <TopSocialBar locale={locale} messages={messages} />
       <Header locale={locale} messages={messages} />
-      <main className="mx-auto min-h-[calc(100vh-240px)] w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</main>
+      <main className="mx-auto min-h-[calc(100vh-220px)] w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
       <Footer locale={locale} messages={messages} />
     </div>
   );

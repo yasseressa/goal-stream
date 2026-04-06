@@ -26,18 +26,28 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [campaignForm, setCampaignForm] = useState<RedirectCampaignPayload>(emptyCampaign);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [campaignError, setCampaignError] = useState<string | null>(null);
+  const [settingsError, setSettingsError] = useState<string | null>(null);
 
-  const refresh = async () => {
+  const loadCampaigns = async () => {
     const token = getAdminToken();
     if (!token) return;
-    const [redirectsResponse, settingsResponse] = await Promise.all([getRedirects(token), getRedirectSettings(token)]);
+    const redirectsResponse = await getRedirects(token);
     setCampaigns(redirectsResponse.items);
+  };
+
+  const loadSettings = async () => {
+    const token = getAdminToken();
+    if (!token) return;
+    const settingsResponse = await getRedirectSettings(token);
     setSettings(settingsResponse);
   };
 
   useEffect(() => {
-    refresh().catch((err) => setError(err instanceof Error ? err.message : messages.loadFailed));
+    setCampaignError(null);
+    setSettingsError(null);
+    loadCampaigns().catch((err) => setCampaignError(err instanceof Error ? err.message : messages.loadFailed));
+    loadSettings().catch((err) => setSettingsError(err instanceof Error ? err.message : messages.loadFailed));
   }, [messages.loadFailed]);
 
   const selectedCampaign = useMemo(
@@ -61,7 +71,7 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
   const handleSaveCampaign = async () => {
     const token = getAdminToken();
     if (!token) return;
-    setError(null);
+    setCampaignError(null);
     setStatusMessage(null);
     try {
       if (selectedCampaignId) {
@@ -71,24 +81,24 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
       }
       setCampaignForm(emptyCampaign);
       setSelectedCampaignId(null);
-      await refresh();
+      await loadCampaigns();
       setStatusMessage(messages.saveSuccess);
     } catch (err) {
-      setError(err instanceof Error ? err.message : messages.loadFailed);
+      setCampaignError(err instanceof Error ? err.message : messages.loadFailed);
     }
   };
 
   const handleSaveSettings = async () => {
     const token = getAdminToken();
     if (!token || !settings) return;
-    setError(null);
+    setSettingsError(null);
     setStatusMessage(null);
     try {
       await updateRedirectSettings(settings, token);
-      await refresh();
+      await loadSettings();
       setStatusMessage(messages.saveSuccess);
     } catch (err) {
-      setError(err instanceof Error ? err.message : messages.loadFailed);
+      setSettingsError(err instanceof Error ? err.message : messages.loadFailed);
     }
   };
 
@@ -98,7 +108,7 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#f4bb41]">{messages.admin}</p>
         <h1 className="text-4xl font-black text-[#f7f0e2]">{messages.redirects}</h1>
       </div>
-      {error ? <p className="text-sm text-[#f5d7c9]">{error}</p> : null}
+      {campaignError ? <p className="text-sm text-[#f5d7c9]">{campaignError}</p> : null}
       {statusMessage ? <p className="text-sm text-[#ccb992]">{statusMessage}</p> : null}
       <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
         <Card className="space-y-4">
@@ -136,7 +146,10 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
           </div>
         </Card>
         <Card className="space-y-4">
-          <h2 className="text-2xl font-black text-[#f7f0e2]">{messages.settings}</h2>
+          <div className="space-y-2">
+            <h2 className="text-2xl font-black text-[#f7f0e2]">{messages.settings}</h2>
+            {settingsError ? <p className="text-sm text-[#f5d7c9]">{settingsError}</p> : null}
+          </div>
           {settings ? (
             <div className="space-y-4">
               <label className="flex items-center gap-3 text-sm font-semibold text-[#f5efe3]">
@@ -146,7 +159,7 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
               <Input value={String(settings.default_cooldown_seconds)} onChange={(e) => setSettings((current) => current ? { ...current, default_cooldown_seconds: Number(e.target.value) || 0 } : current)} placeholder={messages.intervalSeconds} />
               <Input value={settings.fallback_url ?? ""} onChange={(e) => setSettings((current) => current ? { ...current, fallback_url: e.target.value } : current)} placeholder={messages.targetUrl} />
               <Select value={settings.active_campaign_id ?? ""} onChange={(e) => setSettings((current) => current ? { ...current, active_campaign_id: e.target.value || null } : current)}>
-                <option value="">No active campaign</option>
+                <option value="">{messages.noActiveCampaign}</option>
                 {campaigns.map((campaign) => (
                   <option key={campaign.id} value={campaign.id}>{campaign.name}</option>
                 ))}
@@ -165,3 +178,4 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
     </div>
   );
 }
+

@@ -25,9 +25,10 @@ class Settings(BaseSettings):
     log_json: bool = False
     sports_provider: str = "mock"
     news_provider: str = "mock"
-    football_data_base_url: str = "https://api.football-data.org/v4"
+    football_data_base_url: str = ""
     football_data_api_key: str = ""
     football_data_competitions: str = "PL,CL,SA,PD,BL1,FL1"
+    football_data_timezone: str = "Asia/Riyadh"
     gnews_base_url: str = "https://gnews.io/api/v4"
     gnews_api_key: str = ""
     gnews_max_results: int = 10

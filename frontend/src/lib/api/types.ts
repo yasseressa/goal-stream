@@ -1,4 +1,4 @@
-﻿export type Locale = "en" | "ar";
+export type Locale = "en" | "ar";
 
 export interface MatchSummary {
   external_match_id: string;
@@ -7,6 +7,9 @@ export interface MatchSummary {
   away_team: string;
   start_time: string;
   status: string;
+  home_team_crest?: string | null;
+  away_team_crest?: string | null;
+  competition_emblem?: string | null;
 }
 
 export interface NewsSummary {
@@ -93,6 +96,11 @@ export interface RedirectSettings {
   default_cooldown_seconds: number;
   open_in_new_tab: boolean;
   fallback_url?: string | null;
+  facebook_url?: string | null;
+  youtube_url?: string | null;
+  instagram_url?: string | null;
+  telegram_url?: string | null;
+  whatsapp_url?: string | null;
   active_campaign_id?: string | null;
   created_at?: string;
   updated_at?: string;
@@ -103,4 +111,13 @@ export interface RedirectConfig {
   interval_seconds: number;
   target_url?: string | null;
   open_in_new_tab: boolean;
+}
+
+export interface SocialLink {
+  label: string;
+  href: string;
+}
+
+export interface SocialLinksResponse {
+  items: SocialLink[];
 }

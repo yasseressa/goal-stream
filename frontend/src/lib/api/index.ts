@@ -1,4 +1,4 @@
-﻿import { apiRequest } from "@/lib/api/client";
+import { apiRequest } from "@/lib/api/client";
 import type {
   HomeResponse,
   LoginPayload,
@@ -10,6 +10,7 @@ import type {
   RedirectCampaignPayload,
   RedirectConfig,
   RedirectSettings,
+  SocialLinksResponse,
   StreamLink,
   StreamListResponse,
 } from "@/lib/api/types";
@@ -28,6 +29,10 @@ export function getNewsArticle(newsSlug: string, locale: string) {
 
 export function getRedirectConfig() {
   return apiRequest<RedirectConfig>("/api/v1/redirect/config");
+}
+
+export function getSocialLinks() {
+  return apiRequest<SocialLinksResponse>("/api/v1/social-links");
 }
 
 export function loginAdmin(payload: LoginPayload) {

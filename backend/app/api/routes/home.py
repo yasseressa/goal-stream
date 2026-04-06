@@ -19,39 +19,9 @@ async def get_home(
 ) -> HomeResponse:
     data = await service.get_home_data(locale)
     return HomeResponse(
-        yesterday_matches=[
-            MatchSummaryResponse(
-                external_match_id=match.external_match_id,
-                competition_name=match.competition_name,
-                home_team=match.home_team,
-                away_team=match.away_team,
-                start_time=match.start_time,
-                status=match.status,
-            )
-            for match in data["yesterday_matches"]
-        ],
-        today_matches=[
-            MatchSummaryResponse(
-                external_match_id=match.external_match_id,
-                competition_name=match.competition_name,
-                home_team=match.home_team,
-                away_team=match.away_team,
-                start_time=match.start_time,
-                status=match.status,
-            )
-            for match in data["today_matches"]
-        ],
-        tomorrow_matches=[
-            MatchSummaryResponse(
-                external_match_id=match.external_match_id,
-                competition_name=match.competition_name,
-                home_team=match.home_team,
-                away_team=match.away_team,
-                start_time=match.start_time,
-                status=match.status,
-            )
-            for match in data["tomorrow_matches"]
-        ],
+        yesterday_matches=[_to_match_summary_response(match) for match in data["yesterday_matches"]],
+        today_matches=[_to_match_summary_response(match) for match in data["today_matches"]],
+        tomorrow_matches=[_to_match_summary_response(match) for match in data["tomorrow_matches"]],
         latest_news=[
             NewsArticleSummaryResponse(
                 slug=article.slug,
@@ -64,4 +34,18 @@ async def get_home(
             )
             for article in data["latest_news"]
         ],
+    )
+
+
+def _to_match_summary_response(match) -> MatchSummaryResponse:
+    return MatchSummaryResponse(
+        external_match_id=match.external_match_id,
+        competition_name=match.competition_name,
+        home_team=match.home_team,
+        away_team=match.away_team,
+        start_time=match.start_time,
+        status=match.status,
+        home_team_crest=match.home_team_crest,
+        away_team_crest=match.away_team_crest,
+        competition_emblem=match.competition_emblem,
     )

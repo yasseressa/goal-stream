@@ -1,6 +1,6 @@
 """add redirect setting tab behavior and stream uniqueness
 
-Revision ID: 0002_redirect_settings_and_stream_uniqueness
+Revision ID: 0002_redirect_streams
 Revises: 0001_initial
 Create Date: 2026-03-24 00:30:00
 """
@@ -10,7 +10,7 @@ from alembic import op
 import sqlalchemy as sa
 
 
-revision = "0002_redirect_settings_and_stream_uniqueness"
+revision = "0002_redirect_streams"
 down_revision = "0001_initial"
 branch_labels = None
 depends_on = None

@@ -12,15 +12,21 @@ interface RequestOptions extends RequestInit {
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { token, headers, ...rest } = options;
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
-    ...rest,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    cache: rest.cache ?? "no-store",
-  });
+
+  let response: Response;
+  try {
+    response = await fetch(`${getApiBaseUrl()}${path}`, {
+      ...rest,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      cache: rest.cache ?? "no-store",
+    });
+  } catch {
+    throw new ApiError("Unable to reach API server", 0);
+  }
 
   if (!response.ok) {
     let detail = response.statusText;

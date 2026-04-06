@@ -18,6 +18,7 @@ depends_on = None
 
 
 stream_type_enum = postgresql.ENUM("hls", "iframe", "embed", "external", name="streamtype")
+stream_type_column = postgresql.ENUM("hls", "iframe", "embed", "external", name="streamtype", create_type=False)
 
 
 def upgrade() -> None:
@@ -74,7 +75,7 @@ def upgrade() -> None:
         sa.Column("id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("external_match_id", sa.String(length=255), nullable=False),
         sa.Column("stream_url", sa.String(length=2048), nullable=False),
-        sa.Column("stream_type", stream_type_enum, nullable=False),
+        sa.Column("stream_type", stream_type_column, nullable=False),
         sa.Column("show_stream", sa.Boolean(), nullable=False, server_default=sa.text("true")),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("TIMEZONE('utc', NOW())")),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("TIMEZONE('utc', NOW())")),
@@ -93,4 +94,3 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_admin_users_email"), table_name="admin_users")
     op.drop_table("admin_users")
     stream_type_enum.drop(op.get_bind(), checkfirst=True)
-

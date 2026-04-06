@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import UTC, timedelta
+from datetime import timedelta
 from types import SimpleNamespace
 
 from app.core.cache import InMemoryCacheBackend
 from app.integrations.shared_models import MatchData
-from app.services.match_service import MatchService
+from app.services.match_service import KSA_TIMEZONE, MatchService
 
 
 class StubSportsClient:
@@ -28,7 +28,7 @@ class StubSession:
 def test_match_service_can_show_player_for_today_match():
     from datetime import datetime
 
-    now = datetime.now(UTC)
+    now = datetime.now(KSA_TIMEZONE)
     match = MatchData(
         external_match_id="today-match",
         competition_name="Premier League",
@@ -46,7 +46,7 @@ def test_match_service_can_show_player_for_today_match():
 def test_match_service_hides_player_for_non_today_match():
     from datetime import datetime
 
-    now = datetime.now(UTC)
+    now = datetime.now(KSA_TIMEZONE)
     match = MatchData(
         external_match_id="old-match",
         competition_name="Premier League",

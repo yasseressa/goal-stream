@@ -14,6 +14,9 @@ class MatchData:
     status: str
     venue: str | None = None
     description: str | None = None
+    home_team_crest: str | None = None
+    away_team_crest: str | None = None
+    competition_emblem: str | None = None
 
 
 @dataclass(slots=True)

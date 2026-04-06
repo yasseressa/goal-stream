@@ -9,11 +9,13 @@ export function MatchListSection({
   title,
   matches,
   emptyLabel,
+  messages,
 }: {
   locale: Locale;
   title: string;
   matches: MatchSummary[];
   emptyLabel: string;
+  messages: Messages;
 }) {
   return (
     <section className="space-y-4">
@@ -26,7 +28,7 @@ export function MatchListSection({
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {matches.map((match) => (
-            <MatchCard key={match.external_match_id} locale={locale} match={match} />
+            <MatchCard key={match.external_match_id} locale={locale} match={match} messages={messages} />
           ))}
         </div>
       )}
