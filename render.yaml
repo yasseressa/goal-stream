@@ -5,7 +5,6 @@ services:
     plan: starter
     dockerfilePath: ./backend/Dockerfile
     dockerContext: .
-    healthCheckPath: /api/v1/health
     envVars:
       - key: APP_ENV
         value: production
