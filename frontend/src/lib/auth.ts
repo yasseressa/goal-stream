@@ -1,11 +1,21 @@
-﻿import { siteConfig } from "@/config/site";
+import { siteConfig } from "@/config/site";
+
+function normalizeApiBaseUrl(value?: string) {
+  if (!value) {
+    return "";
+  }
+
+  return value.startsWith("http://") || value.startsWith("https://") ? value : `http://${value}`;
+}
 
 export function getApiBaseUrl() {
   if (typeof window === "undefined") {
-    return process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+    return normalizeApiBaseUrl(
+      process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000",
+    );
   }
 
-  return process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+  return normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL);
 }
 
 export function getAdminToken() {

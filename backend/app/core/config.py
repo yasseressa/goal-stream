@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-from pydantic import computed_field
+from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -40,10 +40,29 @@ class Settings(BaseSettings):
     database_name: str = "melbet_live"
     database_user: str = "melbet"
     database_password: str = "melbet"
+    database_url_override: str | None = Field(default=None, alias="DATABASE_URL")
+    sync_database_url_override: str | None = Field(default=None, alias="SYNC_DATABASE_URL")
+    cors_allow_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+
+    def _normalize_database_url(self, url: str, driver: str) -> str:
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql://", 1)
+
+        if url.startswith("postgresql+"):
+            base_url = url.split("://", 1)[1]
+            return f"postgresql+{driver}://{base_url}"
+
+        if url.startswith("postgresql://"):
+            return url.replace("postgresql://", f"postgresql+{driver}://", 1)
+
+        return url
 
     @computed_field
     @property
     def database_url(self) -> str:
+        if self.database_url_override:
+            return self._normalize_database_url(self.database_url_override, "asyncpg")
+
         return (
             f"postgresql+asyncpg://{self.database_user}:{self.database_password}"
             f"@{self.database_host}:{self.database_port}/{self.database_name}"
@@ -52,6 +71,12 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def sync_database_url(self) -> str:
+        if self.sync_database_url_override:
+            return self._normalize_database_url(self.sync_database_url_override, "psycopg")
+
+        if self.database_url_override:
+            return self._normalize_database_url(self.database_url_override, "psycopg")
+
         return (
             f"postgresql+psycopg://{self.database_user}:{self.database_password}"
             f"@{self.database_host}:{self.database_port}/{self.database_name}"
@@ -61,6 +86,11 @@ class Settings(BaseSettings):
     @property
     def football_data_competition_codes(self) -> list[str]:
         return [code.strip().upper() for code in self.football_data_competitions.split(",") if code.strip()]
+
+    @computed_field
+    @property
+    def cors_origins(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_allow_origins.split(",") if origin.strip()]
 
 
 @lru_cache
