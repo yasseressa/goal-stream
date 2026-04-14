@@ -98,6 +98,9 @@ This repo includes a root `render.yaml` for a free-friendly Render setup with:
    - `SECRET_KEY=<long random secret>`
    - `FOOTBALL_DATA_API_KEY=<your key>`
    - `GNEWS_API_KEY=<your key>`
+   - `ADMIN_BOOTSTRAP_USERNAME=<your first admin username>`
+   - `ADMIN_BOOTSTRAP_EMAIL=<your first admin email>`
+   - `ADMIN_BOOTSTRAP_PASSWORD=<your first admin password>`
 4. Set the frontend service environment variables:
    - `INTERNAL_API_BASE_URL=https://<your-backend-service>.onrender.com`
    - `NEXT_PUBLIC_API_BASE_URL=https://<your-backend-service>.onrender.com` (optional)
@@ -110,6 +113,7 @@ This repo includes a root `render.yaml` for a free-friendly Render setup with:
 - The backend runs `alembic upgrade head` on startup before launching Uvicorn.
 - On the free plan, both backend and frontend are public web services.
 - The frontend can proxy browser API calls through its own service when `INTERNAL_API_BASE_URL` is set.
+- If `ADMIN_BOOTSTRAP_USERNAME`, `ADMIN_BOOTSTRAP_EMAIL`, and `ADMIN_BOOTSTRAP_PASSWORD` are all set on the backend, the app will create the first admin user automatically on startup if it does not already exist.
 - If you want to call the backend directly from another origin later, set `CORS_ALLOW_ORIGINS` on the backend service to a comma-separated list of allowed frontend URLs.
 
 ## Frontend Route Assumptions

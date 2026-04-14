@@ -7,6 +7,7 @@ from app.api.router import api_router
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
+from app.services.bootstrap_service import ensure_bootstrap_admin
 
 configure_logging()
 
@@ -26,6 +27,11 @@ app.add_middleware(
 
 register_exception_handlers(app)
 app.include_router(api_router, prefix=settings.api_v1_prefix)
+
+
+@app.on_event("startup")
+async def bootstrap_admin_user() -> None:
+    await ensure_bootstrap_admin()
 
 
 @app.api_route("/", methods=["GET", "HEAD"])

@@ -43,6 +43,9 @@ class Settings(BaseSettings):
     database_url_override: str | None = Field(default=None, alias="DATABASE_URL")
     sync_database_url_override: str | None = Field(default=None, alias="SYNC_DATABASE_URL")
     cors_allow_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    admin_bootstrap_username: str | None = None
+    admin_bootstrap_email: str | None = None
+    admin_bootstrap_password: str | None = None
 
     def _normalize_database_url(self, url: str, driver: str) -> str:
         if url.startswith("postgres://"):
@@ -91,6 +94,13 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.cors_allow_origins.split(",") if origin.strip()]
+
+    @computed_field
+    @property
+    def should_bootstrap_admin(self) -> bool:
+        return bool(
+            self.admin_bootstrap_username and self.admin_bootstrap_email and self.admin_bootstrap_password
+        )
 
 
 @lru_cache
