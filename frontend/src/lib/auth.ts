@@ -15,7 +15,7 @@ export function getApiBaseUrl() {
     );
   }
 
-  return normalizeApiBaseUrl(process.env.NEXT_PUBLIC_API_BASE_URL);
+  return "";
 }
 
 export function getAdminToken() {
