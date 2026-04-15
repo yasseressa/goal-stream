@@ -125,6 +125,8 @@ function NewsPanel({ locale, article, readMoreLabel }: { locale: Locale; article
   return (
     <Link
       href={`/${locale}/news/${article.slug}`}
+      target="_blank"
+      rel="noreferrer"
       className="group flex h-full flex-col rounded-[1.3rem] border border-[rgba(255,194,0,0.12)] bg-[#101010] p-4 transition hover:border-[#f1bc26]"
       data-disable-global-redirect
     >

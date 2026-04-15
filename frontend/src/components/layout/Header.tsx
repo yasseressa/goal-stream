@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import type { Locale, Messages } from "@/i18n";
@@ -24,7 +22,7 @@ export function Header({ locale, messages }: { locale: Locale; messages: Message
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
           <nav className="flex flex-wrap gap-2 sm:gap-3">
             {navLinks.map((link, index) => (
-              <Link
+              <a
                 key={link.href}
                 href={link.href}
                 className={`inline-flex min-h-[3.2rem] items-center gap-2 rounded-[0.95rem] border px-4 text-sm font-extrabold uppercase tracking-[0.08em] transition sm:px-5 ${
@@ -36,7 +34,7 @@ export function Header({ locale, messages }: { locale: Locale; messages: Message
               >
                 <span className="text-[#f1bc26]">{link.icon}</span>
                 <span>{link.label}</span>
-              </Link>
+              </a>
             ))}
           </nav>
 
