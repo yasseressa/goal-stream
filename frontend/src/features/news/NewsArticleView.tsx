@@ -9,7 +9,7 @@ export function NewsArticleView({ locale, messages, article }: { locale: Locale;
       <Card className="overflow-hidden p-0">
         {article.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={article.image_url} alt={article.title} className="h-[320px] w-full object-cover" />
+          <img src={article.image_url} alt={article.title} className="h-[320px] w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
         ) : null}
         <div className="space-y-4 p-6 sm:p-8">
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#f4bb41]">{article.source}</p>

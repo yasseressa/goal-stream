@@ -130,6 +130,18 @@ function NewsPanel({ locale, article, readMoreLabel }: { locale: Locale; article
       className="group flex h-full flex-col rounded-[1.3rem] border border-[rgba(255,194,0,0.12)] bg-[#101010] p-4 transition hover:border-[#f1bc26]"
       data-disable-global-redirect
     >
+      {article.image_url ? (
+        <div className="overflow-hidden rounded-[1rem] border border-[rgba(255,194,0,0.08)] bg-[#17120d]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={article.image_url}
+            alt={article.title}
+            className="h-48 w-full object-cover transition duration-300 group-hover:scale-[1.03]"
+            loading="lazy"
+            referrerPolicy="no-referrer"
+          />
+        </div>
+      ) : null}
       <p className="text-[0.7rem] font-extrabold uppercase tracking-[0.18em] text-[#f1bc26]">{article.source}</p>
       <h3 className="mt-3 text-lg font-black uppercase leading-6 tracking-[-0.02em] text-white transition group-hover:text-[#ffe08b]">
         {article.title}

@@ -11,7 +11,7 @@ export function NewsCard({ locale, article, readMoreLabel }: { locale: Locale; a
       {article.image_url ? (
         <div className="overflow-hidden rounded-[1rem] bg-[#17120d]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={article.image_url} alt={article.title} className="h-48 w-full object-cover" />
+          <img src={article.image_url} alt={article.title} className="h-48 w-full object-cover" loading="lazy" referrerPolicy="no-referrer" />
         </div>
       ) : null}
       <div className="space-y-3">

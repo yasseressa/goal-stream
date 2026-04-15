@@ -1,4 +1,4 @@
-export type Locale = "en" | "ar";
+export type Locale = "en" | "ar" | "fr" | "es";
 
 export interface MatchSummary {
   external_match_id: string;
