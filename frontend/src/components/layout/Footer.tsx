@@ -15,7 +15,7 @@ export function Footer({ locale, messages }: { locale: Locale; messages: Message
           <Link href={`/${locale}`} className="transition hover:text-[#f1bc26]" data-disable-global-redirect>{messages.home}</Link>
           <Link href={`/${locale}#matches`} className="transition hover:text-[#f1bc26]" data-disable-global-redirect>{messages.matches}</Link>
           <Link href={`/${locale}#news`} className="transition hover:text-[#f1bc26]" data-disable-global-redirect>{messages.sportsNews}</Link>
-          <Link href={`/${locale}/admin/login`} className="transition hover:text-[#f1bc26]" data-disable-global-redirect>{messages.admin}</Link>
+          <Link href={`/${locale}/contact`} className="transition hover:text-[#f1bc26]" data-disable-global-redirect>{messages.contactUs}</Link>
         </div>
       </div>
     </footer>

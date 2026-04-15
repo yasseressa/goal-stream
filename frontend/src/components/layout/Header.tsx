@@ -8,7 +8,7 @@ export function Header({ locale, messages }: { locale: Locale; messages: Message
   const navLinks = [
     { href: `/${locale}#matches`, label: messages.matches, icon: <CalendarIcon /> },
     { href: `/${locale}#news`, label: messages.sportsNews, icon: <NewsIcon /> },
-    { href: `/${locale}/admin/login`, label: messages.admin, icon: <MailIcon /> },
+    { href: `/${locale}/contact`, label: messages.contactUs, icon: <MailIcon /> },
   ];
 
   return (
