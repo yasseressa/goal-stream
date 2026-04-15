@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +11,8 @@ from app.core.security import get_password_hash
 from app.models.admin_user import AdminUser
 from app.repositories.admin_user import AdminUserRepository
 from app.schemas.auth import LoginRequest, TokenResponse
+
+logger = logging.getLogger(__name__)
 
 
 class AuthService:
@@ -22,14 +26,17 @@ class AuthService:
 
         user = await self.repository.get_by_login(normalized_login)
         if user is not None and user.is_active and verify_password(normalized_password, user.password_hash):
+            logger.info("admin_login_success", extra={"login": normalized_login, "mode": "database"})
             await self.repository.update_last_login(user)
             await self.session.commit()
             return TokenResponse(access_token=create_access_token(user.id))
 
         bootstrap_user = await self._try_bootstrap_login(normalized_login, normalized_password)
         if bootstrap_user is None or not bootstrap_user.is_active:
+            logger.warning("admin_login_failed", extra={"login": normalized_login})
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
+        logger.info("admin_login_success", extra={"login": normalized_login, "mode": "bootstrap_fallback"})
         await self.repository.update_last_login(bootstrap_user)
         await self.session.commit()
 
@@ -39,6 +46,19 @@ class AuthService:
         bootstrap_username = _normalize_value(settings.admin_bootstrap_username)
         bootstrap_email = _normalize_email(settings.admin_bootstrap_email)
         bootstrap_password = _normalize_value(settings.admin_bootstrap_password)
+
+        logger.info(
+            "bootstrap_login_check",
+            extra={
+                "login": login,
+                "bootstrap_username_present": bool(bootstrap_username),
+                "bootstrap_email_present": bool(bootstrap_email),
+                "password_present": bool(bootstrap_password),
+                "login_matches_username": login == bootstrap_username,
+                "login_matches_email": login == bootstrap_email,
+                "password_matches_bootstrap": password == bootstrap_password,
+            },
+        )
 
         if not bootstrap_username or not bootstrap_email or not bootstrap_password:
             return None
@@ -62,6 +82,7 @@ class AuthService:
             )
             self.session.add(user)
             await self.session.flush()
+            logger.info("bootstrap_login_created_admin", extra={"login": login})
             return user
 
         user.username = bootstrap_username
@@ -70,6 +91,7 @@ class AuthService:
         user.is_active = True
         user.is_superuser = True
         await self.session.flush()
+        logger.info("bootstrap_login_updated_admin", extra={"login": login})
         return user
 
 
