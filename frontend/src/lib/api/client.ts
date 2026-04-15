@@ -1,4 +1,4 @@
-﻿import { getApiBaseUrl } from "@/lib/auth";
+import { getApiBaseUrl } from "@/lib/auth";
 
 export class ApiError extends Error {
   constructor(message: string, public status: number) {
@@ -12,23 +12,38 @@ interface RequestOptions extends RequestInit {
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { token, headers, ...rest } = options;
+  const requestUrl = `${getApiBaseUrl()}${path}`;
+  const isSafeMethod = (rest.method ?? "GET").toUpperCase() === "GET";
+  const maxAttempts = isSafeMethod ? 3 : 1;
 
-  let response: Response;
-  try {
-    response = await fetch(`${getApiBaseUrl()}${path}`, {
-      ...rest,
-      headers: {
-        "Content-Type": "application/json",
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        ...headers,
-      },
-      cache: rest.cache ?? "no-store",
-    });
-  } catch {
-    throw new ApiError("Unable to reach API server", 0);
-  }
+  let lastError: ApiError | null = null;
 
-  if (!response.ok) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    let response: Response;
+
+    try {
+      response = await fetch(requestUrl, {
+        ...rest,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...headers,
+        },
+        cache: rest.cache ?? "no-store",
+      });
+    } catch {
+      lastError = new ApiError("Unable to reach API server", 0);
+      if (attempt < maxAttempts) {
+        await delay(attempt * 1000);
+        continue;
+      }
+      throw lastError;
+    }
+
+    if (response.ok) {
+      return response.json() as Promise<T>;
+    }
+
     let detail = response.statusText;
     try {
       const payload = (await response.json()) as { detail?: string };
@@ -36,8 +51,24 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     } catch {
       // Ignore JSON parsing failure for non-JSON errors.
     }
-    throw new ApiError(detail, response.status);
+
+    lastError = new ApiError(detail, response.status);
+
+    if (attempt < maxAttempts && shouldRetry(response.status)) {
+      await delay(attempt * 1000);
+      continue;
+    }
+
+    throw lastError;
   }
 
-  return response.json() as Promise<T>;
+  throw lastError ?? new ApiError("Unknown API error", 0);
+}
+
+function shouldRetry(status: number) {
+  return status === 0 || status === 408 || status === 425 || status === 429 || status === 502 || status === 503 || status === 504;
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
