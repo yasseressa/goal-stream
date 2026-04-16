@@ -17,10 +17,10 @@ export function HomePageView({ locale, messages, data }: { locale: Locale; messa
   const activeBucket = buckets.find((bucket) => bucket.id === activeBucketId) ?? buckets[0];
 
   return (
-    <div className="space-y-8 pb-10 sm:space-y-10 lg:space-y-12 lg:pb-14">
+    <div className="space-y-6 pb-8 min-[420px]:space-y-8 min-[420px]:pb-10 sm:space-y-10 lg:space-y-12 lg:pb-14">
       <section
         id="matches"
-        className="rounded-[1.85rem] border border-[rgba(255,194,0,0.14)] bg-[linear-gradient(180deg,#0a0a0a_0%,#070707_100%)] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.34)] sm:p-6 lg:p-8"
+        className="rounded-[1.45rem] border border-[rgba(255,194,0,0.14)] bg-[linear-gradient(180deg,#0a0a0a_0%,#070707_100%)] p-3.5 shadow-[0_18px_50px_rgba(0,0,0,0.34)] min-[380px]:p-4 min-[420px]:rounded-[1.7rem] min-[420px]:p-5 sm:p-6 lg:p-8"
       >
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
@@ -38,7 +38,7 @@ export function HomePageView({ locale, messages, data }: { locale: Locale; messa
                   key={bucket.id}
                   type="button"
                   onClick={() => setActiveBucketId(bucket.id)}
-                  className={`rounded-[0.9rem] border px-4 py-2.5 text-xs font-extrabold uppercase tracking-[0.12em] transition sm:text-sm ${
+                  className={`flex-1 rounded-[0.9rem] border px-3 py-2.5 text-[0.68rem] font-extrabold uppercase tracking-[0.08em] transition min-[420px]:flex-none min-[420px]:px-4 min-[420px]:text-xs min-[420px]:tracking-[0.12em] sm:text-sm ${
                     active
                       ? "border-[#f1bc26] bg-[linear-gradient(180deg,#ffd34c_0%,#f0af00_100%)] text-[#111]"
                       : "border-[rgba(255,194,0,0.18)] bg-[#101010] text-[#ddd5c8] hover:border-[#f1bc26] hover:text-[#f1bc26]"
@@ -64,7 +64,7 @@ export function HomePageView({ locale, messages, data }: { locale: Locale; messa
 
       <section
         id="news"
-        className="rounded-[1.85rem] border border-[rgba(255,194,0,0.14)] bg-[linear-gradient(180deg,#0a0a0a_0%,#070707_100%)] p-5 shadow-[0_18px_50px_rgba(0,0,0,0.34)] sm:p-6 lg:p-8"
+        className="rounded-[1.45rem] border border-[rgba(255,194,0,0.14)] bg-[linear-gradient(180deg,#0a0a0a_0%,#070707_100%)] p-3.5 shadow-[0_18px_50px_rgba(0,0,0,0.34)] min-[380px]:p-4 min-[420px]:rounded-[1.7rem] min-[420px]:p-5 sm:p-6 lg:p-8"
       >
         <div>
           <SectionEyebrow title={messages.latest} accent={messages.sportsNews} />
@@ -100,11 +100,11 @@ function FeatureMatchRow({ locale, match, messages }: { locale: Locale; match: M
     >
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
         <div className="min-w-0 xl:w-[12rem]">
-          <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.18em] text-[#f1bc26]">{formatMatchDate(match.start_time, locale)}</p>
+          <p className="text-[0.62rem] font-extrabold uppercase tracking-[0.14em] text-[#f1bc26] min-[420px]:text-[0.68rem] min-[420px]:tracking-[0.18em]">{formatMatchDate(match.start_time, locale)}</p>
           <p className="mt-2 text-sm font-semibold text-[#d6d0c5]">{formatMatchTime(match.start_time, locale)}</p>
         </div>
 
-        <div className="grid flex-1 gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+        <div className="grid flex-1 gap-4 min-[480px]:grid-cols-[1fr_auto_1fr] min-[480px]:items-center">
           <TeamDisplay align="start" name={match.home_team} logo={match.home_team_crest} />
           <div className="text-center">
             <p className="text-lg font-black uppercase tracking-[0.08em] text-[#f1bc26]">{statusText(match.status, messages)}</p>
@@ -146,7 +146,7 @@ function NewsPanel({ locale, article, readMoreLabel }: { locale: Locale; article
       <h3 className="mt-3 text-lg font-black uppercase leading-6 tracking-[-0.02em] text-white transition group-hover:text-[#ffe08b]">
         {article.title}
       </h3>
-      <p className="mt-3 line-clamp-4 flex-1 text-sm leading-7 text-[#b6b0a5]">{article.summary}</p>
+      <p className="mt-3 line-clamp-4 flex-1 text-sm leading-6 text-[#b6b0a5] min-[420px]:leading-7">{article.summary}</p>
       <span className="mt-4 text-sm font-bold uppercase tracking-[0.12em] text-[#f1bc26]">{readMoreLabel}</span>
     </Link>
   );
@@ -156,9 +156,9 @@ function TeamDisplay({ name, logo, align }: { name: string; logo?: string | null
   const isEnd = align === "end";
 
   return (
-    <div className={`flex items-center gap-3 ${isEnd ? "sm:flex-row-reverse sm:text-right" : "text-left"}`}>
+    <div className={`flex items-center gap-3 ${isEnd ? "min-[480px]:flex-row-reverse min-[480px]:text-right" : "text-left"}`}>
       <TeamLogo src={logo} alt={name} />
-      <p className="text-base font-black uppercase tracking-[0.04em] text-[#f6f0e5] sm:text-lg">{name}</p>
+      <p className="text-sm font-black uppercase tracking-[0.03em] text-[#f6f0e5] min-[420px]:text-base sm:text-lg">{name}</p>
     </div>
   );
 }
@@ -179,7 +179,7 @@ function TeamLogo({ src, alt }: { src?: string | null; alt: string }) {
 function SectionEyebrow({ title, accent }: { title: string; accent: string }) {
   return (
     <div>
-      <h2 className="text-[2rem] font-black uppercase leading-none tracking-[-0.04em] text-white sm:text-[2.5rem]">
+      <h2 className="text-[1.65rem] font-black uppercase leading-none tracking-[-0.04em] text-white min-[420px]:text-[2rem] sm:text-[2.5rem]">
         {title} <span className="text-[#f1bc26]">{accent}</span>
       </h2>
       <span className="mt-3 block h-[3px] w-16 bg-[#f1bc26]" />

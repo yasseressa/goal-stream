@@ -13,7 +13,7 @@ export function Header({ locale, messages }: { locale: Locale; messages: Message
 
   return (
     <header className="sticky top-0 z-40 border-b border-[rgba(255,194,0,0.16)] bg-[rgba(7,7,7,0.92)] backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1400px] flex-col gap-4 px-3 py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      <div className="mx-auto flex max-w-[1400px] flex-col gap-3 px-2.5 py-3 min-[380px]:px-3 min-[420px]:py-4 sm:px-5 lg:flex-row lg:items-center lg:justify-between lg:px-8">
         <div className="flex items-center justify-between gap-4">
           <BrandLogo locale={locale} />
           <div className="lg:hidden">
@@ -27,7 +27,7 @@ export function Header({ locale, messages }: { locale: Locale; messages: Message
               <Link
                 key={link.href}
                 href={link.href}
-                className={`inline-flex min-h-[3.2rem] items-center gap-2 rounded-[0.95rem] border px-4 text-sm font-extrabold uppercase tracking-[0.08em] transition sm:px-5 ${
+                className={`inline-flex min-h-[3rem] flex-1 items-center justify-center gap-2 rounded-[0.95rem] border px-3 text-center text-[0.72rem] font-extrabold uppercase tracking-[0.06em] transition min-[420px]:flex-none min-[420px]:px-4 min-[420px]:text-sm sm:min-h-[3.2rem] sm:px-5 sm:tracking-[0.08em] ${
                   index === 0
                     ? "border-[#c69111] bg-[rgba(255,194,0,0.06)] text-white shadow-[inset_0_0_0_1px_rgba(255,194,0,0.06)]"
                     : "border-[rgba(255,194,0,0.14)] bg-[#0f0f0f] text-[#d8d1c5] hover:border-[#c69111] hover:text-white"
