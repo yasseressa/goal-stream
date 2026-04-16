@@ -48,6 +48,20 @@ class RedirectService:
         logger.info("redirect_campaign_updated", extra={"redirect_id": redirect_id})
         return updated
 
+    async def delete_campaign(self, redirect_id: str) -> None:
+        campaign = await self.campaign_repository.get_by_id(redirect_id)
+        if campaign is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Redirect campaign not found")
+
+        settings_row = await self.get_settings()
+        if str(settings_row.active_campaign_id) == str(campaign.id):
+            settings_row.active_campaign_id = None
+
+        await self.campaign_repository.delete(campaign)
+        await self.session.commit()
+        self.cache.delete(CacheKeys.redirect_config())
+        logger.info("redirect_campaign_deleted", extra={"redirect_id": redirect_id})
+
     async def get_settings(self):
         settings_row = await self.setting_repository.get_settings()
         if settings_row is None:

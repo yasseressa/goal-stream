@@ -52,6 +52,10 @@ class StreamLinkRepository:
         await self.session.refresh(stream_link)
         return stream_link
 
+    async def delete(self, stream_link: StreamLink) -> None:
+        await self.session.delete(stream_link)
+        await self.session.flush()
+
 
 def _is_missing_stream_links_table(exc: ProgrammingError) -> bool:
     return 'relation "stream_links" does not exist' in str(exc)

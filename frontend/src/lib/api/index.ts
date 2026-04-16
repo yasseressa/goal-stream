@@ -66,6 +66,13 @@ export function updateStream(externalId: string, payload: Omit<StreamLink, "exte
   });
 }
 
+export function deleteStream(externalId: string, token: string) {
+  return apiRequest<void>(`/api/v1/admin/streams/${encodeURIComponent(externalId)}`, {
+    method: "DELETE",
+    token,
+  });
+}
+
 export function getRedirects(token: string) {
   return apiRequest<RedirectCampaignListResponse>("/api/v1/admin/redirects", { token });
 }
@@ -82,6 +89,13 @@ export function updateRedirect(redirectId: string, payload: RedirectCampaignPayl
   return apiRequest<RedirectCampaign>(`/api/v1/admin/redirects/${redirectId}`, {
     method: "PUT",
     body: JSON.stringify(payload),
+    token,
+  });
+}
+
+export function deleteRedirect(redirectId: string, token: string) {
+  return apiRequest<void>(`/api/v1/admin/redirects/${redirectId}`, {
+    method: "DELETE",
     token,
   });
 }

@@ -46,3 +46,11 @@ async def update_stream(
 ) -> StreamLinkAdminResponse:
     stream = await service.update_stream(external_match_id, payload)
     return StreamLinkAdminResponse.model_validate(stream)
+
+
+@router.delete("/{external_match_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(get_current_admin_user)])
+async def delete_stream(
+    external_match_id: str,
+    service: StreamService = Depends(get_stream_service),
+) -> None:
+    await service.delete_stream(external_match_id)

@@ -50,3 +50,7 @@ class RedirectCampaignRepository:
         await self.session.flush()
         await self.session.refresh(campaign)
         return campaign
+
+    async def delete(self, campaign: RedirectCampaign) -> None:
+        await self.session.delete(campaign)
+        await self.session.flush()

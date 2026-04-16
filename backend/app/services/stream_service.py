@@ -41,3 +41,9 @@ class StreamService:
         await self.session.commit()
         logger.info("admin_stream_updated", extra={"external_match_id": external_match_id})
         return updated
+
+    async def delete_stream(self, external_match_id: str) -> None:
+        stream_link = await self.get_stream(external_match_id)
+        await self.repository.delete(stream_link)
+        await self.session.commit()
+        logger.info("admin_stream_deleted", extra={"external_match_id": external_match_id})

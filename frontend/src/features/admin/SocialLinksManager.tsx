@@ -1,19 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { AdminToast } from "@/components/admin/AdminToast";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import type { Locale, Messages } from "@/i18n";
 import { getAdminToken } from "@/lib/auth";
 import { getRedirectSettings, updateRedirectSettings } from "@/lib/api";
 import type { RedirectSettings } from "@/lib/api/types";
 
+type SocialKey = "facebook_url" | "youtube_url" | "instagram_url" | "telegram_url" | "whatsapp_url";
+
+const socialOptions: Array<{ key: SocialKey; messageKey: string }> = [
+  { key: "facebook_url", messageKey: "facebookUrl" },
+  { key: "youtube_url", messageKey: "youtubeUrl" },
+  { key: "instagram_url", messageKey: "instagramUrl" },
+  { key: "telegram_url", messageKey: "telegramUrl" },
+  { key: "whatsapp_url", messageKey: "whatsappUrl" },
+];
+
 export function SocialLinksManager({ locale: _locale, messages }: { locale: Locale; messages: Messages }) {
+  const text = messages as Record<string, string>;
   const [settings, setSettings] = useState<RedirectSettings | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<SocialKey>("facebook_url");
+  const [urlValue, setUrlValue] = useState("");
+  const [editingKey, setEditingKey] = useState<SocialKey | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<SocialKey | null>(null);
 
   useEffect(() => {
     const token = getAdminToken();
@@ -23,49 +41,140 @@ export function SocialLinksManager({ locale: _locale, messages }: { locale: Loca
       .catch((err) => setError(err instanceof Error ? err.message : messages.loadFailed));
   }, [messages.loadFailed]);
 
-  const updateField = (field: keyof RedirectSettings, value: string) => {
-    setSettings((current) => (current ? { ...current, [field]: value || null } : current));
-  };
+  const rows = useMemo(() => {
+    if (!settings) return [];
+    return socialOptions
+      .map((option) => ({
+        key: option.key,
+        label: text[option.messageKey] ?? option.messageKey,
+        value: settings[option.key],
+      }))
+      .filter((row) => row.value);
+  }, [settings, text]);
 
-  const handleSave = async () => {
+  async function persist(nextSettings: RedirectSettings, successMessage: string) {
     const token = getAdminToken();
-    if (!token || !settings) return;
+    if (!token) return;
     setError(null);
-    setStatusMessage(null);
     try {
-      await updateRedirectSettings(settings, token);
-      setStatusMessage(messages.saveSuccess);
+      const updated = await updateRedirectSettings(nextSettings, token);
+      setSettings(updated);
+      setToastMessage(successMessage);
+      setEditingKey(null);
+      setDeleteTarget(null);
+      setUrlValue("");
     } catch (err) {
       setError(err instanceof Error ? err.message : messages.loadFailed);
     }
-  };
+  }
+
+  function startEdit(key: SocialKey, value: string) {
+    setEditingKey(key);
+    setSelectedKey(key);
+    setUrlValue(value);
+  }
+
+  function resetForm() {
+    setEditingKey(null);
+    setSelectedKey("facebook_url");
+    setUrlValue("");
+  }
+
+  async function handleSave() {
+    if (!settings || !urlValue) return;
+    await persist({ ...settings, [selectedKey]: urlValue }, messages.saveSuccess);
+  }
+
+  async function handleDelete() {
+    if (!settings || !deleteTarget) return;
+    await persist({ ...settings, [deleteTarget]: null }, text.deleteSuccess ?? "Item deleted successfully.");
+  }
 
   return (
     <div className="space-y-6">
+      <AdminToast message={toastMessage} onClose={() => setToastMessage(null)} />
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={text.confirmDeleteTitle ?? "Confirm deletion"}
+        description={text.confirmDeleteMessage ?? "This item will be deleted permanently."}
+        confirmLabel={text.delete ?? "Delete"}
+        cancelLabel={text.cancelAction ?? "Cancel"}
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteTarget(null)}
+      />
+
       <div>
         <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#f4bb41]">{messages.admin}</p>
         <h1 className="text-4xl font-black text-[#f7f0e2]">{messages.socialLinks}</h1>
       </div>
       {error ? <p className="text-sm text-[#f5d7c9]">{error}</p> : null}
-      {statusMessage ? <p className="text-sm text-[#ccb992]">{statusMessage}</p> : null}
-      <Card className="space-y-4">
-        <div>
-          <h2 className="text-2xl font-black text-[#f7f0e2]">{messages.socialLinks}</h2>
-          <p className="mt-2 text-sm text-[#ccb992]">{messages.manageSocialLinks}</p>
-        </div>
-        {settings ? (
-          <div className="space-y-3">
-            <Input value={settings.facebook_url ?? ""} onChange={(e) => updateField("facebook_url", e.target.value)} placeholder={messages.facebookUrl} data-disable-global-redirect />
-            <Input value={settings.youtube_url ?? ""} onChange={(e) => updateField("youtube_url", e.target.value)} placeholder={messages.youtubeUrl} data-disable-global-redirect />
-            <Input value={settings.instagram_url ?? ""} onChange={(e) => updateField("instagram_url", e.target.value)} placeholder={messages.instagramUrl} data-disable-global-redirect />
-            <Input value={settings.telegram_url ?? ""} onChange={(e) => updateField("telegram_url", e.target.value)} placeholder={messages.telegramUrl} data-disable-global-redirect />
-            <Input value={settings.whatsapp_url ?? ""} onChange={(e) => updateField("whatsapp_url", e.target.value)} placeholder={messages.whatsappUrl} data-disable-global-redirect />
-            <Button onClick={handleSave}>{messages.save}</Button>
+
+      <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <Card className="overflow-hidden p-0">
+          <div className="flex items-center justify-between border-b border-[#3a2b14] px-5 py-4">
+            <h2 className="text-2xl font-black text-[#f7f0e2]">{text.savedItems ?? messages.socialLinks}</h2>
+            <Button variant="ghost" onClick={resetForm}>{messages.createNew}</Button>
           </div>
-        ) : (
-          <p className="text-[#ccb992]">{messages.loading}</p>
-        )}
-      </Card>
+          {rows.length === 0 ? <div className="p-6 text-[#ccb992]">{text.noSavedItems ?? messages.manageSocialLinks}</div> : null}
+          {rows.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead className="bg-[#120f0b] text-[#f4bb41]">
+                  <tr>
+                    <th className="px-4 py-3 text-left">{text.platform ?? "Platform"}</th>
+                    <th className="px-4 py-3 text-left">{messages.targetUrl}</th>
+                    <th className="px-4 py-3 text-left">{messages.actions}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.key} className="border-t border-[#3a2b14]">
+                      <td className="px-4 py-3 text-[#f7f0e2]">{row.label}</td>
+                      <td className="px-4 py-3 text-[#ccb992]">{row.value}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <Button variant="ghost" onClick={() => startEdit(row.key, row.value ?? "")}>{messages.edit}</Button>
+                          <button type="button" onClick={() => setDeleteTarget(row.key)} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#5a221a] bg-[#21110f] text-[#ff8c73] transition hover:bg-[#351512]" aria-label={text.delete ?? "Delete"}>
+                            <TrashIcon />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+        </Card>
+
+        <Card className="space-y-4">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-2xl font-black text-[#f7f0e2]">{editingKey ? messages.edit : messages.socialLinks}</h2>
+            {editingKey ? <Button variant="secondary" onClick={resetForm}>{messages.createNew}</Button> : null}
+          </div>
+          <p className="text-sm text-[#ccb992]">{messages.manageSocialLinks}</p>
+          <Select value={selectedKey} onChange={(e) => setSelectedKey(e.target.value as SocialKey)} disabled={Boolean(editingKey)}>
+            {socialOptions.map((option) => (
+              <option key={option.key} value={option.key}>{text[option.messageKey] ?? option.messageKey}</option>
+            ))}
+          </Select>
+          <Input value={urlValue} onChange={(e) => setUrlValue(e.target.value)} placeholder={messages.targetUrl} />
+          <Button onClick={handleSave} disabled={!settings || !urlValue}>
+            {editingKey ? messages.update : messages.save}
+          </Button>
+        </Card>
+      </div>
     </div>
+  );
+}
+
+function TrashIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-none stroke-current" strokeWidth="1.8" aria-hidden="true">
+      <path d="M4 7h16" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M6 7l1 12h10l1-12" />
+      <path d="M9 7V4h6v3" />
+    </svg>
   );
 }

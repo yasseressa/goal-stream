@@ -17,7 +17,7 @@ function getApiBaseUrl() {
 async function forwardRequest(
   request: NextRequest,
   externalId: string,
-  method: "GET" | "PUT",
+  method: "GET" | "PUT" | "DELETE",
 ) {
   const apiBaseUrl = getApiBaseUrl();
 
@@ -74,4 +74,12 @@ export async function PUT(
 ) {
   const { externalId } = await context.params;
   return forwardRequest(request, externalId, "PUT");
+}
+
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ externalId: string }> },
+) {
+  const { externalId } = await context.params;
+  return forwardRequest(request, externalId, "DELETE");
 }

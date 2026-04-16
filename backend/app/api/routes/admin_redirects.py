@@ -37,3 +37,11 @@ async def update_redirect(
 ) -> RedirectCampaignResponse:
     campaign = await service.update_campaign(redirect_id, payload)
     return RedirectCampaignResponse.model_validate(campaign)
+
+
+@router.delete("/{redirect_id}", status_code=status.HTTP_204_NO_CONTENT, dependencies=[Depends(get_current_admin_user)])
+async def delete_redirect(
+    redirect_id: str,
+    service: RedirectService = Depends(get_redirect_service),
+) -> None:
+    await service.delete_campaign(redirect_id)
