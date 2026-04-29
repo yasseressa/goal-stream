@@ -98,8 +98,6 @@ class RedirectService:
         active_campaign = None
         if settings_row.active_campaign_id is not None:
             active_campaign = await self.campaign_repository.get_by_id(settings_row.active_campaign_id)
-        if active_campaign is None:
-            active_campaign = await self.campaign_repository.get_active_campaign()
 
         target_url = active_campaign.target_url if active_campaign else settings_row.fallback_url
         interval_seconds = active_campaign.cooldown_seconds if active_campaign else settings_row.default_cooldown_seconds
