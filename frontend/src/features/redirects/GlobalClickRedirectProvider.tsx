@@ -7,8 +7,6 @@ import { siteConfig } from "@/config/site";
 import { getRedirectConfig } from "@/lib/api";
 import type { RedirectConfig } from "@/lib/api/types";
 
-const interactiveTags = new Set(["A", "INPUT", "TEXTAREA", "SELECT", "OPTION", "BUTTON", "LABEL"]);
-
 export function GlobalClickRedirectProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const configRef = useRef<RedirectConfig | null>(null);
@@ -34,15 +32,6 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
     }
 
     const handleClick = async (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target) {
-        return;
-      }
-
-      if (interactiveTags.has(target.tagName) || target.closest("[data-disable-global-redirect]")) {
-        return;
-      }
-
       const config = await refreshRedirectConfig();
       if (!config?.enabled || !config.target_url) {
         return;
@@ -55,6 +44,8 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
       }
 
       window.localStorage.setItem(siteConfig.redirectStorageKey, String(now));
+      event.preventDefault();
+      event.stopPropagation();
       if (config.open_in_new_tab) {
         window.open(config.target_url, "_blank", "noopener,noreferrer");
       } else {
@@ -62,8 +53,8 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
       }
     };
 
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
+    document.addEventListener("click", handleClick, true);
+    return () => document.removeEventListener("click", handleClick, true);
   }, [pathname]);
 
   async function refreshRedirectConfig() {
