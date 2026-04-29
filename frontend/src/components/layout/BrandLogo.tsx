@@ -11,7 +11,6 @@ export function BrandLogo({ locale, compact = false }: { locale: Locale; compact
         }`}
       >
         <span className={`font-bold leading-8 ${compact ? "text-xl" : "text-2xl sm:text-[30px]"}`}>Goal Stream</span>
-        <span className={`leading-6 opacity-95 ${compact ? "text-xs" : "text-sm sm:text-base"}`}>melbet-live</span>
       </span>
     </Link>
   );
