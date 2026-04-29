@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from "@/lib/auth";
+import { getApiBaseUrl, notifyAdminSessionExpired } from "@/lib/auth";
 
 export class ApiError extends Error {
   constructor(message: string, public status: number) {
@@ -58,6 +58,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     }
 
     clearTimeout(timeout);
+
+    if (token && response.status === 401) {
+      notifyAdminSessionExpired();
+    }
 
     if (response.ok) {
       if (response.status === 204) {

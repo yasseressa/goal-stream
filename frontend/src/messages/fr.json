@@ -58,6 +58,7 @@
   "manageRedirects": "Gérez les campagnes de redirection et le comportement des clics.",
   "publicSite": "Site public",
   "loginFailed": "Échec de la connexion. Vérifiez vos identifiants.",
+  "sessionExpired": "Votre session administrateur a expiré. Veuillez vous reconnecter.",
   "saveSuccess": "Les modifications ont été enregistrées avec succès.",
   "loadFailed": "Impossible de charger les données pour le moment.",
   "noStreamsYet": "Aucun lien de diffusion n'a encore été créé.",

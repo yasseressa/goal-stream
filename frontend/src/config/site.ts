@@ -4,6 +4,7 @@ export const siteConfig = {
   name: "Goal Stream",
   description: "Multilingual football matches and news platform",
   adminStorageKey: "goal-stream-admin-token",
+  adminExpiresStorageKey: "goal-stream-admin-expires-at",
   redirectStorageKey: "goal-stream-last-redirect",
   defaultSocialLinks: [
     { label: "Facebook", href: "https://facebook.com" },

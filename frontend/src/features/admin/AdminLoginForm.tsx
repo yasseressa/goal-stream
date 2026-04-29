@@ -11,8 +11,9 @@ import type { Locale, Messages } from "@/i18n";
 import { setAdminToken } from "@/lib/auth";
 import { loginAdmin } from "@/lib/api";
 
-export function AdminLoginForm({ locale, messages }: { locale: Locale; messages: Messages }) {
+export function AdminLoginForm({ locale, messages, sessionExpired = false }: { locale: Locale; messages: Messages; sessionExpired?: boolean }) {
   const router = useRouter();
+  const text = messages as Record<string, string>;
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export function AdminLoginForm({ locale, messages }: { locale: Locale; messages:
     try {
       const result = await loginAdmin({ login, password });
       setAdminToken(result.access_token);
-      router.push(`/${locale}/admin/streams`);
+      router.replace(`/${locale}/admin/streams`);
     } catch (err) {
       const message = err instanceof Error ? err.message : messages.loginFailed;
       setError(message || messages.loginFailed);
@@ -47,6 +48,7 @@ export function AdminLoginForm({ locale, messages }: { locale: Locale; messages:
         <form className="space-y-4" onSubmit={handleSubmit}>
           <Input value={login} onChange={(event) => setLogin(event.target.value)} placeholder={messages.usernameOrEmail} required data-disable-global-redirect />
           <Input value={password} onChange={(event) => setPassword(event.target.value)} placeholder={messages.password} required type="password" data-disable-global-redirect />
+          {!error && sessionExpired ? <p className="text-sm text-[#931800]">{text.sessionExpired ?? "Your session has expired. Please log in again."}</p> : null}
           {error ? <p className="text-sm text-[#931800]">{error}</p> : null}
           {loading ? <p className="text-xs text-[#626883]">If the server is waking up on Render, login may take a few seconds.</p> : null}
           <Button className="w-full" disabled={loading} type="submit">{loading ? messages.loading : messages.login}</Button>

@@ -58,6 +58,7 @@
   "manageRedirects": "Administra campañas de redirección y comportamiento de clics.",
   "publicSite": "Sitio público",
   "loginFailed": "No se pudo iniciar sesión. Revisa tus credenciales.",
+  "sessionExpired": "Tu sesión de administración ha expirado. Vuelve a iniciar sesión.",
   "saveSuccess": "Los cambios se guardaron correctamente.",
   "loadFailed": "No se pudieron cargar los datos en este momento.",
   "noStreamsYet": "Aún no se han creado enlaces de transmisión.",

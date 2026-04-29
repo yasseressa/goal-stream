@@ -58,6 +58,7 @@
   "manageRedirects": "Manage redirect campaigns and click behavior.",
   "publicSite": "Public Site",
   "loginFailed": "Login failed. Please check your credentials.",
+  "sessionExpired": "Your admin session has expired. Please log in again.",
   "saveSuccess": "Changes saved successfully.",
   "loadFailed": "Unable to load data right now.",
   "noStreamsYet": "No stream links created yet.",

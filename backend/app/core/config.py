@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
 
     secret_key: str = "change-me-to-a-long-random-secret"
-    access_token_expire_minutes: int = 60
+    access_token_expire_minutes: int = 10
 
     log_level: str = "INFO"
     log_json: bool = False

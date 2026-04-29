@@ -8,7 +8,7 @@ import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/config/site";
 import type { Locale, Messages } from "@/i18n";
-import { clearAdminToken, getAdminToken } from "@/lib/auth";
+import { clearAdminToken, getAdminToken, isAdminSessionExpired, onAdminSessionExpired } from "@/lib/auth";
 
 export function AdminShell({ children, locale, messages }: { children: React.ReactNode; locale: Locale; messages: Messages }) {
   const pathname = usePathname();
@@ -18,12 +18,36 @@ export function AdminShell({ children, locale, messages }: { children: React.Rea
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = getAdminToken();
-    setAuthenticated(Boolean(token));
-    setReady(true);
-    if (!token && !isLoginPage) {
-      router.replace(`/${locale}/admin/login`);
+    function sendToLogin(expired = false) {
+      const query = expired ? "?expired=1" : "";
+      router.replace(`/${locale}/admin/login${query}`);
     }
+
+    function verifySession() {
+      const expired = isAdminSessionExpired();
+      const token = getAdminToken();
+      setAuthenticated(Boolean(token));
+      setReady(true);
+      if (!token && !isLoginPage) {
+        sendToLogin(expired);
+      }
+    }
+
+    verifySession();
+
+    const intervalId = window.setInterval(verifySession, 1000);
+    const removeSessionListener = onAdminSessionExpired(() => {
+      setAuthenticated(false);
+      setReady(true);
+      if (!isLoginPage) {
+        sendToLogin(true);
+      }
+    });
+
+    return () => {
+      window.clearInterval(intervalId);
+      removeSessionListener();
+    };
   }, [isLoginPage, locale, router]);
 
   const links = useMemo(
