@@ -132,7 +132,7 @@ function FeatureMatchRow({ locale, match, messages, now }: { locale: Locale; mat
 
   return (
     <Link
-      href={`/${locale}/matches/${encodeURIComponent(match.external_match_id)}`}
+      href={`/${locale}/match/${encodeURIComponent(match.external_match_id)}`}
       target="_blank"
       rel="noreferrer"
       className="group relative mb-3 block overflow-hidden rounded-lg bg-[#eceef2] text-[#222] transition hover:text-[#222]"

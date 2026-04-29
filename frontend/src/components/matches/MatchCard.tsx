@@ -23,7 +23,7 @@ export function MatchCard({ locale, match, messages }: { locale: Locale; match: 
       <div className="space-y-3">
         <p className="text-sm text-[#626883]">{formatDate(match.start_time, locale)}</p>
         <Link
-          href={`/${locale}/matches/${encodeURIComponent(match.external_match_id)}`}
+          href={`/${locale}/match/${encodeURIComponent(match.external_match_id)}`}
           target="_blank"
           rel="noreferrer"
           className="inline-flex min-h-10 items-center justify-center rounded-lg bg-[#273340] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#931800]"

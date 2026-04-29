@@ -44,6 +44,9 @@ export function localizePathname(pathname: string | null | undefined, targetLoca
 
   if (isLocale(segments[0])) {
     segments[0] = targetLocale;
+    if (segments[1] === "matches" && segments[2]) {
+      segments[1] = "match";
+    }
     return `/${segments.join("/")}`;
   }
 
