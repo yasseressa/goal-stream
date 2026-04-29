@@ -37,6 +37,7 @@ export async function GET() {
     status: upstreamResponse.status,
     headers: {
       "Content-Type": upstreamResponse.headers.get("content-type") || "application/json",
+      "Cache-Control": "no-store, max-age=0",
     },
   });
 }

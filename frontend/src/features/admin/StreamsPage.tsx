@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { AdminToast } from "@/components/admin/AdminToast";
@@ -32,12 +32,17 @@ export function StreamsPage({ locale, messages, initialMatchBuckets }: { locale:
   const [submitting, setSubmitting] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
+  const streamsRequestIdRef = useRef(0);
 
   const loadStreams = async () => {
     const token = getAdminToken();
     if (!token) return;
+    const requestId = streamsRequestIdRef.current + 1;
+    streamsRequestIdRef.current = requestId;
     const response = await getStreams(token);
-    setItems(response.items);
+    if (streamsRequestIdRef.current === requestId) {
+      setItems(response.items);
+    }
   };
 
   useEffect(() => {
@@ -109,6 +114,7 @@ export function StreamsPage({ locale, messages, initialMatchBuckets }: { locale:
     setError(null);
     try {
       await deleteStream(target, token);
+      streamsRequestIdRef.current += 1;
       setItems((current) => current.filter((item) => item.external_match_id !== target));
       setToastMessage(text.deleteSuccess ?? "Item deleted successfully.");
       if (editingId === target) startCreate();

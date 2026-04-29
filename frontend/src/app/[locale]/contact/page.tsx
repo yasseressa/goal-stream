@@ -62,7 +62,7 @@ function ContactCard({ link }: { link: SocialLink }) {
       </span>
       <span className="min-w-0">
         <span className="block text-lg font-semibold">{link.label}</span>
-        <span className="mt-1 block text-sm text-[#626883] group-hover:text-[#931800]">فتح وسيلة التواصل</span>
+        <span className="mt-1 block text-sm text-[#626883] group-hover:text-[#931800]"></span>
       </span>
     </Link>
   );

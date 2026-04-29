@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 function normalizeApiBaseUrl(value?: string) {
   if (!value) {
@@ -45,10 +46,15 @@ async function forwardRequest(request: NextRequest, method: "GET" | "PUT") {
 
   const responseText = await upstreamResponse.text();
 
+  if (upstreamResponse.ok && method === "PUT") {
+    revalidatePath("/api/v1/redirect/config");
+  }
+
   return new NextResponse(responseText, {
     status: upstreamResponse.status,
     headers: {
       "Content-Type": upstreamResponse.headers.get("content-type") || "application/json",
+      "Cache-Control": "no-store, max-age=0",
     },
   });
 }

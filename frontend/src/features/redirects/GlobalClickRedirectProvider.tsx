@@ -5,19 +5,21 @@ import { usePathname } from "next/navigation";
 
 import { siteConfig } from "@/config/site";
 import { getRedirectConfig } from "@/lib/api";
+import type { RedirectConfig } from "@/lib/api/types";
 
 const interactiveTags = new Set(["A", "INPUT", "TEXTAREA", "SELECT", "OPTION", "BUTTON", "LABEL"]);
 
 export function GlobalClickRedirectProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const configRef = useRef<{ enabled: boolean; interval_seconds: number; target_url?: string | null; open_in_new_tab: boolean } | null>(null);
+  const configRef = useRef<RedirectConfig | null>(null);
+  const configRequestRef = useRef<Promise<RedirectConfig | null> | null>(null);
 
   useEffect(() => {
     if (pathname.includes("/admin")) {
       return;
     }
 
-    getRedirectConfig()
+    refreshRedirectConfig()
       .then((config) => {
         configRef.current = config;
       })
@@ -31,7 +33,7 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
       return;
     }
 
-    const handleClick = (event: MouseEvent) => {
+    const handleClick = async (event: MouseEvent) => {
       const target = event.target as HTMLElement | null;
       if (!target) {
         return;
@@ -41,7 +43,7 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
         return;
       }
 
-      const config = configRef.current;
+      const config = await refreshRedirectConfig();
       if (!config?.enabled || !config.target_url) {
         return;
       }
@@ -63,6 +65,25 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, [pathname]);
+
+  async function refreshRedirectConfig() {
+    if (!configRequestRef.current) {
+      configRequestRef.current = getRedirectConfig()
+        .then((config) => {
+          configRef.current = config;
+          return config;
+        })
+        .catch(() => {
+          configRef.current = null;
+          return null;
+        })
+        .finally(() => {
+          configRequestRef.current = null;
+        });
+    }
+
+    return configRequestRef.current;
+  }
 
   return <>{children}</>;
 }

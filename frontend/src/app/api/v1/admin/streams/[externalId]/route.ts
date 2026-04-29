@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const PUBLIC_LOCALES = ["ar", "en", "fr", "es"];
 
@@ -94,5 +94,7 @@ export async function DELETE(
 function revalidateStream(externalMatchId: string) {
   for (const locale of PUBLIC_LOCALES) {
     revalidateTag(`match:${locale}:${externalMatchId}`);
+    revalidatePath(`/${locale}/match/${encodeURIComponent(externalMatchId)}`);
+    revalidatePath(`/${locale}/matches/${encodeURIComponent(externalMatchId)}`);
   }
 }
