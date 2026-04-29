@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+
+const PUBLIC_LOCALES = ["ar", "en", "fr", "es"];
 
 function normalizeApiBaseUrl(value?: string) {
   if (!value) {
@@ -45,6 +48,17 @@ async function forwardRequest(request: NextRequest, method: "GET" | "POST") {
 
   const responseText = await upstreamResponse.text();
 
+  if (upstreamResponse.ok && method === "POST") {
+    try {
+      const stream = JSON.parse(responseText) as { external_match_id?: string };
+      if (stream.external_match_id) {
+        revalidateStream(stream.external_match_id);
+      }
+    } catch {
+      // Ignore malformed upstream response bodies; the response is still forwarded.
+    }
+  }
+
   return new NextResponse(responseText, {
     status: upstreamResponse.status,
     headers: {
@@ -59,4 +73,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   return forwardRequest(request, "POST");
+}
+
+function revalidateStream(externalMatchId: string) {
+  for (const locale of PUBLIC_LOCALES) {
+    revalidateTag(`match:${locale}:${externalMatchId}`);
+  }
 }

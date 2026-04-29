@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
+
+const PUBLIC_LOCALES = ["ar", "en", "fr", "es"];
 
 function normalizeApiBaseUrl(value?: string) {
   if (!value) {
@@ -52,6 +55,10 @@ async function forwardRequest(
 
   const responseText = await upstreamResponse.text();
 
+  if (upstreamResponse.ok && (method === "PUT" || method === "DELETE")) {
+    revalidateStream(externalId);
+  }
+
   return new NextResponse(responseText, {
     status: upstreamResponse.status,
     headers: {
@@ -82,4 +89,10 @@ export async function DELETE(
 ) {
   const { externalId } = await context.params;
   return forwardRequest(request, externalId, "DELETE");
+}
+
+function revalidateStream(externalMatchId: string) {
+  for (const locale of PUBLIC_LOCALES) {
+    revalidateTag(`match:${locale}:${externalMatchId}`);
+  }
 }

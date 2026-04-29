@@ -77,12 +77,20 @@ export function StreamsPage({ locale, messages, initialMatchBuckets }: { locale:
     setSubmitting(true);
     setError(null);
     try {
+      let savedStream: StreamLink;
       if (editingId) {
-        await updateStream(editingId, { stream_url: form.stream_url, stream_type: form.stream_type, show_stream: form.show_stream }, token);
+        savedStream = await updateStream(editingId, { stream_url: form.stream_url, stream_type: form.stream_type, show_stream: form.show_stream }, token);
+        setItems((current) => current.map((item) => (item.external_match_id === editingId ? savedStream : item)));
       } else {
-        await createStream(form, token);
+        savedStream = await createStream(form, token);
+        setItems((current) => {
+          const exists = current.some((item) => item.external_match_id === savedStream.external_match_id);
+          return exists
+            ? current.map((item) => (item.external_match_id === savedStream.external_match_id ? savedStream : item))
+            : [savedStream, ...current];
+        });
       }
-      await loadStreams();
+      loadStreams().catch(() => undefined);
       setToastMessage(messages.saveSuccess);
       startCreate();
     } catch (err) {
@@ -95,13 +103,16 @@ export function StreamsPage({ locale, messages, initialMatchBuckets }: { locale:
   async function handleDelete() {
     const token = getAdminToken();
     if (!token || !deleteTarget) return;
+    const target = deleteTarget;
+    setDeleteTarget(null);
     setDeleteBusy(true);
+    setError(null);
     try {
-      await deleteStream(deleteTarget, token);
-      await loadStreams();
+      await deleteStream(target, token);
+      setItems((current) => current.filter((item) => item.external_match_id !== target));
       setToastMessage(text.deleteSuccess ?? "Item deleted successfully.");
-      if (editingId === deleteTarget) startCreate();
-      setDeleteTarget(null);
+      if (editingId === target) startCreate();
+      loadStreams().catch(() => undefined);
     } catch (err) {
       setError(err instanceof Error ? err.message : messages.loadFailed);
     } finally {

@@ -32,6 +32,7 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
   const [campaignError, setCampaignError] = useState<string | null>(null);
   const [settingsError, setSettingsError] = useState<string | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
 
   const loadCampaigns = async () => {
     const token = getAdminToken();
@@ -76,12 +77,15 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
     if (!token) return;
     setCampaignError(null);
     try {
+      let savedCampaign: RedirectCampaign;
       if (editingId) {
-        await updateRedirect(editingId, campaignForm, token);
+        savedCampaign = await updateRedirect(editingId, campaignForm, token);
+        setCampaigns((current) => current.map((campaign) => (campaign.id === editingId ? savedCampaign : campaign)));
       } else {
-        await createRedirect(campaignForm, token);
+        savedCampaign = await createRedirect(campaignForm, token);
+        setCampaigns((current) => [savedCampaign, ...current]);
       }
-      await loadCampaigns();
+      loadCampaigns().catch(() => undefined);
       setToastMessage(messages.saveSuccess);
       resetCampaignForm();
     } catch (err) {
@@ -92,15 +96,22 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
   async function handleDeleteCampaign() {
     const token = getAdminToken();
     if (!token || !deleteTarget) return;
+    const target = deleteTarget;
+    setDeleteTarget(null);
+    setDeleteBusy(true);
+    setCampaignError(null);
     try {
-      await deleteRedirect(deleteTarget, token);
-      await loadCampaigns();
-      await loadSettings();
+      await deleteRedirect(target, token);
+      setCampaigns((current) => current.filter((campaign) => campaign.id !== target));
+      setSettings((current) => current && current.active_campaign_id === target ? { ...current, active_campaign_id: null } : current);
+      loadCampaigns().catch(() => undefined);
+      loadSettings().catch(() => undefined);
       setToastMessage(text.deleteSuccess ?? "Item deleted successfully.");
-      if (editingId === deleteTarget) resetCampaignForm();
-      setDeleteTarget(null);
+      if (editingId === target) resetCampaignForm();
     } catch (err) {
       setCampaignError(err instanceof Error ? err.message : messages.loadFailed);
+    } finally {
+      setDeleteBusy(false);
     }
   }
 
@@ -109,8 +120,8 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
     if (!token || !settings) return;
     setSettingsError(null);
     try {
-      await updateRedirectSettings(settings, token);
-      await loadSettings();
+      const updatedSettings = await updateRedirectSettings(settings, token);
+      setSettings(updatedSettings);
       setToastMessage(messages.saveSuccess);
     } catch (err) {
       setSettingsError(err instanceof Error ? err.message : messages.loadFailed);
@@ -128,6 +139,7 @@ export function RedirectsManager({ locale: _locale, messages }: { locale: Locale
         cancelLabel={text.cancelAction ?? "Cancel"}
         onConfirm={handleDeleteCampaign}
         onCancel={() => setDeleteTarget(null)}
+        busy={deleteBusy}
       />
 
       <div>

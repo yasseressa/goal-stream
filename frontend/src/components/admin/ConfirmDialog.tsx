@@ -34,7 +34,7 @@ export function ConfirmDialog({
           <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
             {cancelLabel}
           </Button>
-          <Button type="button" onClick={onConfirm} disabled={busy} className="bg-[#d8583d] text-[#222] hover:bg-[#eb6a4f]">
+          <Button type="button" onClick={onConfirm} disabled={busy} className="bg-[#d8583d] text-white hover:bg-[#eb6a4f]">
             {busy ? "..." : confirmLabel}
           </Button>
         </div>
