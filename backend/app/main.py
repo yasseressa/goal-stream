@@ -4,10 +4,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
+from app.api.deps import cache_backend
 from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
+from app.integrations.news import get_news_client
+from app.integrations.sports import get_sports_client
 from app.services.bootstrap_service import ensure_bootstrap_admin
+from app.services.cache_refresh_service import PublicCacheRefreshService
 from app.services.schema_service import ensure_database_schema
 
 configure_logging()
@@ -34,6 +38,19 @@ app.include_router(api_router, prefix=settings.api_v1_prefix)
 async def bootstrap_admin_user() -> None:
     await ensure_database_schema()
     await ensure_bootstrap_admin()
+    app.state.public_cache_refresh_service = PublicCacheRefreshService(
+        sports_client=get_sports_client(),
+        news_client=get_news_client(),
+        cache=cache_backend,
+    )
+    app.state.public_cache_refresh_service.start()
+
+
+@app.on_event("shutdown")
+async def stop_public_cache_refresh() -> None:
+    service = getattr(app.state, "public_cache_refresh_service", None)
+    if service is not None:
+        await service.stop()
 
 
 @app.api_route("/", methods=["GET", "HEAD"])

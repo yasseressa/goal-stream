@@ -5,6 +5,8 @@ import { getMessages, isLocale } from "@/i18n";
 import { getMatchDetails } from "@/lib/api";
 import { ApiError } from "@/lib/api/client";
 
+export const revalidate = 1800;
+
 export default async function MatchPage({
   params,
 }: {

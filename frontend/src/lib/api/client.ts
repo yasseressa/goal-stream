@@ -8,15 +8,18 @@ export class ApiError extends Error {
 
 interface RequestOptions extends RequestInit {
   token?: string | null;
+  cacheTags?: string[];
+  revalidateSeconds?: number;
 }
 
 const REQUEST_TIMEOUT_MS = 15000;
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { token, headers, ...rest } = options;
+  const { token, headers, cacheTags, revalidateSeconds, ...rest } = options;
   const requestUrl = `${getApiBaseUrl()}${path}`;
   const isSafeMethod = (rest.method ?? "GET").toUpperCase() === "GET";
   const maxAttempts = isSafeMethod ? 3 : 1;
+  const shouldUseNextCache = isSafeMethod && !token && typeof window === "undefined" && revalidateSeconds !== undefined;
 
   let lastError: ApiError | null = null;
 
@@ -33,7 +36,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
           ...headers,
         },
-        cache: rest.cache ?? "no-store",
+        cache: shouldUseNextCache ? rest.cache : rest.cache ?? "no-store",
+        next: shouldUseNextCache ? { revalidate: revalidateSeconds, tags: cacheTags } : undefined,
         signal: controller.signal,
       });
     } catch (error) {

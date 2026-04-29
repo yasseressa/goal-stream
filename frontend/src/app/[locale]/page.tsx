@@ -5,6 +5,8 @@ import { getMessages, isLocale } from "@/i18n";
 import { getHomePageData } from "@/lib/api";
 import type { HomeResponse } from "@/lib/api/types";
 
+export const revalidate = 1800;
+
 const emptyHomePageData: HomeResponse = {
   yesterday_matches: [],
   today_matches: [],

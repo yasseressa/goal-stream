@@ -4,8 +4,6 @@ import { LocalePageShell } from "@/components/layout/LocalePageShell";
 import { GlobalClickRedirectProvider } from "@/features/redirects/GlobalClickRedirectProvider";
 import { getMessages, isLocale, locales } from "@/i18n";
 
-export const dynamic = "force-dynamic";
-
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }

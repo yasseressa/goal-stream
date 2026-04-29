@@ -71,7 +71,6 @@ export function LanguageSwitcher({ locale }: { locale: Locale }) {
                   active ? "bg-[#931800] text-white" : "text-[#222] hover:bg-[#eceef2] hover:text-[#931800]"
                 }`}
                 data-disable-global-redirect
-                prefetch={false}
                 title={localeMeta[item].label}
                 onClick={() => setIsOpen(false)}
               >

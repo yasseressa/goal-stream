@@ -15,16 +15,28 @@ import type {
   StreamListResponse,
 } from "@/lib/api/types";
 
+const MATCHES_REVALIDATE_SECONDS = 30 * 60;
+const NEWS_REVALIDATE_SECONDS = 6 * 60 * 60;
+
 export function getHomePageData(locale: string) {
-  return apiRequest<HomeResponse>(`/api/v1/home?locale=${locale}`);
+  return apiRequest<HomeResponse>(`/api/v1/home?locale=${locale}`, {
+    cacheTags: [`home:${locale}`, `matches:${locale}`, `news:${locale}`],
+    revalidateSeconds: MATCHES_REVALIDATE_SECONDS,
+  });
 }
 
 export function getMatchDetails(matchId: string, locale: string) {
-  return apiRequest<MatchDetails>(`/api/v1/matches/${encodeURIComponent(matchId)}?locale=${locale}`);
+  return apiRequest<MatchDetails>(`/api/v1/matches/${encodeURIComponent(matchId)}?locale=${locale}`, {
+    cacheTags: [`match:${locale}:${matchId}`, `matches:${locale}`],
+    revalidateSeconds: MATCHES_REVALIDATE_SECONDS,
+  });
 }
 
 export function getNewsArticle(newsSlug: string, locale: string) {
-  return apiRequest<NewsArticle>(`/api/v1/news/${encodeURIComponent(newsSlug)}?locale=${locale}`);
+  return apiRequest<NewsArticle>(`/api/v1/news/${encodeURIComponent(newsSlug)}?locale=${locale}`, {
+    cacheTags: [`news:${locale}`, `news:${locale}:${newsSlug}`],
+    revalidateSeconds: NEWS_REVALIDATE_SECONDS,
+  });
 }
 
 export function getRedirectConfig() {

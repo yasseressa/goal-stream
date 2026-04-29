@@ -4,6 +4,8 @@ import { NewsArticleView } from "@/features/news/NewsArticleView";
 import { getMessages, isLocale } from "@/i18n";
 import { getNewsArticle } from "@/lib/api";
 
+export const revalidate = 21600;
+
 export default async function NewsPage({
   params,
 }: {

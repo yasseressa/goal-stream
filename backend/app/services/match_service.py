@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheBackend, CacheKeys
 from app.core.config import settings
-from app.core.constants import MATCH_DETAILS_CACHE_TTL_SECONDS
+from app.core.constants import HOME_MATCHES_CACHE_TTL_SECONDS, MATCH_DETAILS_CACHE_TTL_SECONDS
 from app.integrations.shared_models import MatchData, NewsArticleData
 from app.integrations.sports.client import SportsAPIClient
 from app.repositories.stream_link import StreamLinkRepository
@@ -74,7 +74,7 @@ class MatchService:
             matches = self.cache.get(CacheKeys.home_matches(locale, bucket))
             if matches is None:
                 matches = await self.sports_client.get_matches_for_date(target_date, locale)
-                self.cache.set(CacheKeys.home_matches(locale, bucket), matches, MATCH_DETAILS_CACHE_TTL_SECONDS)
+                self.cache.set(CacheKeys.home_matches(locale, bucket), matches, HOME_MATCHES_CACHE_TTL_SECONDS)
             for match in matches:
                 if match.external_match_id == match_id:
                     return match
