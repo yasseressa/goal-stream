@@ -56,6 +56,24 @@ ARABIC_TRANSLATIONS = {
 }
 
 _LATIN_WORD_PATTERN = re.compile(r"[A-Za-zÀ-ÿ]+(?:[-'][A-Za-zÀ-ÿ]+)*")
+_SPORTS_NAME_STOP_WORDS = {
+    "ac",
+    "afc",
+    "as",
+    "bk",
+    "cf",
+    "club",
+    "de",
+    "fc",
+    "fk",
+    "if",
+    "rc",
+    "sc",
+    "sk",
+    "ssc",
+    "sv",
+    "the",
+}
 _DIGRAPH_MAP = (
     ("sch", "ش"),
     ("sh", "ش"),
@@ -164,7 +182,16 @@ def _lookup_csv_translation(value: str, locale: str) -> str | None:
     locale_translations = translations.get(locale)
     if not locale_translations:
         return None
-    return locale_translations.get(_normalize_lookup_key(value))
+    lookup_key = _normalize_lookup_key(value)
+    direct = locale_translations.get(lookup_key)
+    if direct:
+        return direct
+
+    relaxed_lookup_key = _normalize_relaxed_lookup_key(value)
+    for source_key, translated in locale_translations.items():
+        if _names_match_relaxed(relaxed_lookup_key, _normalize_relaxed_lookup_key(source_key)):
+            return translated
+    return None
 
 
 @lru_cache
@@ -200,7 +227,26 @@ def _translation_csv_path() -> Path:
 
 
 def _normalize_lookup_key(value: str) -> str:
-    return " ".join(value.casefold().replace("-", " ").split())
+    normalized = value.casefold().replace("-", " ")
+    normalized = re.sub(r"[^a-z0-9\u00c0-\u024f]+", " ", normalized)
+    return " ".join(normalized.split())
+
+
+def _normalize_relaxed_lookup_key(value: str) -> str:
+    words = [
+        word
+        for word in _normalize_lookup_key(value).split()
+        if word not in _SPORTS_NAME_STOP_WORDS
+    ]
+    return " ".join(words)
+
+
+def _names_match_relaxed(candidate: str, source: str) -> bool:
+    if not candidate or not source:
+        return False
+    if candidate == source:
+        return True
+    return f" {candidate} " in f" {source} " or f" {source} " in f" {candidate} "
 
 
 def _clean_csv_value(value: str | None) -> str | None:
