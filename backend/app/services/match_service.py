@@ -2,13 +2,11 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheBackend, CacheKeys
-from app.core.config import settings
 from app.core.constants import HOME_MATCHES_CACHE_TTL_SECONDS, MATCH_DETAILS_CACHE_TTL_SECONDS
 from app.integrations.shared_models import MatchData, NewsArticleData
 from app.integrations.sports.client import SportsAPIClient
@@ -16,7 +14,6 @@ from app.repositories.stream_link import StreamLinkRepository
 from app.services.news_service import NewsService
 
 logger = logging.getLogger(__name__)
-KSA_TIMEZONE = ZoneInfo(settings.football_data_timezone)
 
 
 class MatchService:
@@ -64,7 +61,7 @@ class MatchService:
         )
 
     async def _find_match_from_home_buckets(self, match_id: str, locale: str) -> MatchData | None:
-        today = datetime.now(KSA_TIMEZONE).date()
+        today = datetime.now().date()
         buckets = (
             ("yesterday", today - timedelta(days=1)),
             ("today", today),

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 import type { Locale, Messages } from "@/i18n";
 import type { HomeResponse, MatchSummary, NewsSummary } from "@/lib/api/types";
-import { getDisplayMatchStatus, getMatchBucket } from "@/lib/utils";
+import { getDisplayMatchStatus } from "@/lib/utils";
 
 export function HomePageView({ locale, messages, data }: { locale: Locale; messages: Messages; data: HomeResponse }) {
   const [now, setNow] = useState(() => new Date());
@@ -18,26 +18,10 @@ export function HomePageView({ locale, messages, data }: { locale: Locale; messa
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const groupedMatches = { yesterday: [] as MatchSummary[], today: [] as MatchSummary[], tomorrow: [] as MatchSummary[] };
-  const seenMatchIds = new Set<string>();
-
-  for (const match of [...data.yesterday_matches, ...data.today_matches, ...data.tomorrow_matches]) {
-    if (seenMatchIds.has(match.external_match_id)) {
-      continue;
-    }
-
-    seenMatchIds.add(match.external_match_id);
-
-    const bucketId = getMatchBucket(match.start_time, now);
-    if (bucketId) {
-      groupedMatches[bucketId].push(match);
-    }
-  }
-
   const buckets = [
-    { id: "today", label: messages.todayMatches, matches: groupedMatches.today },
-    { id: "tomorrow", label: messages.tomorrowMatches, matches: groupedMatches.tomorrow },
-    { id: "yesterday", label: messages.yesterdayMatches, matches: groupedMatches.yesterday },
+    { id: "today", label: messages.todayMatches, matches: data.today_matches },
+    { id: "tomorrow", label: messages.tomorrowMatches, matches: data.tomorrow_matches },
+    { id: "yesterday", label: messages.yesterdayMatches, matches: data.yesterday_matches },
   ] as const;
 
   const preferredBucketId = buckets.find((bucket) => bucket.matches.length > 0)?.id ?? "today";

@@ -103,15 +103,16 @@ class FootballDataSportsAPIClient(SportsAPIClient):
             )
 
     async def _fetch_fixtures(self, target_date: date, log_context: dict) -> dict | None:
+        request_date = target_date.isoformat()
         try:
             async with httpx.AsyncClient(base_url=self.base_url, headers=self.headers, timeout=20.0) as client:
-                response = await client.get(_FIXTURES_PATH, params={"date": target_date.isoformat()})
+                response = await client.get(_FIXTURES_PATH, params={"date": request_date})
             response.raise_for_status()
             return response.json()
         except httpx.HTTPError:
             logger.exception(
                 "sports_api_request_failed",
-                extra={"provider": _PROVIDER_NAME, **log_context},
+                extra={"provider": _PROVIDER_NAME, "path": _FIXTURES_PATH, "date": request_date, **log_context},
             )
             return None
 
