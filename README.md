@@ -96,10 +96,9 @@ This repo includes a root `render.yaml` for a free-friendly Render setup with:
    - `APP_DEBUG=false`
    - `DATABASE_URL=<Render internal database URL>`
    - `SECRET_KEY=<long random secret>`
-   - `SPORTS_PROVIDER=rapidapi`
-   - `FOOTBALL_DATA_BASE_URL=https://free-api-live-football-data.p.rapidapi.com`
-   - `FOOTBALL_DATA_RAPIDAPI_HOST=free-api-live-football-data.p.rapidapi.com`
-   - `FOOTBALL_DATA_API_KEY=<your RapidAPI key>`
+   - `SPORTS_PROVIDER=api_sports`
+   - `FOOTBALL_DATA_BASE_URL=https://v3.football.api-sports.io`
+   - `FOOTBALL_DATA_API_KEY=<your API-SPORTS key>`
    - `GNEWS_API_KEY=<your key>`
    - `ADMIN_BOOTSTRAP_USERNAME=<your first admin username>`
    - `ADMIN_BOOTSTRAP_EMAIL=<your first admin email>`

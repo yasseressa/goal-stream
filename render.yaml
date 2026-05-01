@@ -18,11 +18,9 @@ services:
       - key: SECRET_KEY
         generateValue: true
       - key: SPORTS_PROVIDER
-        value: rapidapi
+        value: api_sports
       - key: FOOTBALL_DATA_BASE_URL
-        value: https://free-api-live-football-data.p.rapidapi.com
-      - key: FOOTBALL_DATA_RAPIDAPI_HOST
-        value: free-api-live-football-data.p.rapidapi.com
+        value: https://v3.football.api-sports.io
       - key: FOOTBALL_DATA_API_KEY
         sync: false
       - key: GNEWS_API_KEY
