@@ -6,7 +6,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.cache import InMemoryCacheBackend
+from app.core.cache import CacheBackend, create_cache_backend
 from app.core.security import decode_access_token
 from app.db.session import get_db_session
 from app.integrations.news import get_news_client
@@ -21,7 +21,7 @@ from app.services.redirect_service import RedirectService
 from app.services.stream_service import StreamService
 
 bearer_scheme = HTTPBearer(auto_error=False)
-cache_backend = InMemoryCacheBackend()
+cache_backend = create_cache_backend()
 
 DbSession = Annotated[AsyncSession, Depends(get_db_session)]
 
@@ -46,19 +46,19 @@ async def get_current_admin_user(
     return user
 
 
-def get_cache_backend() -> InMemoryCacheBackend:
+def get_cache_backend() -> CacheBackend:
     return cache_backend
 
 
 def get_news_service(
-    cache: Annotated[InMemoryCacheBackend, Depends(get_cache_backend)],
+    cache: Annotated[CacheBackend, Depends(get_cache_backend)],
     client: Annotated[NewsAPIClient, Depends(get_news_client)],
 ) -> NewsService:
     return NewsService(client=client, cache=cache)
 
 
 def get_home_service(
-    cache: Annotated[InMemoryCacheBackend, Depends(get_cache_backend)],
+    cache: Annotated[CacheBackend, Depends(get_cache_backend)],
     sports_client: Annotated[SportsAPIClient, Depends(get_sports_client)],
     news_service: Annotated[NewsService, Depends(get_news_service)],
 ) -> HomeService:
@@ -67,7 +67,7 @@ def get_home_service(
 
 def get_match_service(
     session: DbSession,
-    cache: Annotated[InMemoryCacheBackend, Depends(get_cache_backend)],
+    cache: Annotated[CacheBackend, Depends(get_cache_backend)],
     sports_client: Annotated[SportsAPIClient, Depends(get_sports_client)],
     news_service: Annotated[NewsService, Depends(get_news_service)],
 ) -> MatchService:
@@ -80,6 +80,6 @@ def get_stream_service(session: DbSession) -> StreamService:
 
 def get_redirect_service(
     session: DbSession,
-    cache: Annotated[InMemoryCacheBackend, Depends(get_cache_backend)],
+    cache: Annotated[CacheBackend, Depends(get_cache_backend)],
 ) -> RedirectService:
     return RedirectService(session=session, cache=cache)

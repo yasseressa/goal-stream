@@ -16,6 +16,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} dir={getDirection(locale)} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var theme=localStorage.getItem("goal-stream-theme");document.documentElement.dataset.theme=theme==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}`,
+          }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );

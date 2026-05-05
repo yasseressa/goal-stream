@@ -6,7 +6,6 @@ import { getHomePageData } from "@/lib/api";
 import type { HomeResponse } from "@/lib/api/types";
 
 export const revalidate = 1800;
-export const dynamic = "force-dynamic";
 
 const emptyHomePageData: HomeResponse = {
   yesterday_matches: [],

@@ -14,6 +14,17 @@
   --dark-color: #273340;
 }
 
+[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #101419;
+  --foreground: #eef2f7;
+  --surface: #171d24;
+  --surface-strong: #202834;
+  --border: #344050;
+  --muted: #b5bfcc;
+  --dark-color: #202834;
+}
+
 html {
   background: var(--background);
   scroll-behavior: smooth;
@@ -44,4 +55,39 @@ body {
 .prose-content a {
   color: var(--main-color);
   text-decoration: underline;
+}
+
+[data-theme="dark"] [class*="bg-white"],
+[data-theme="dark"] [class*="bg-[#fff"] {
+  background-color: var(--surface) !important;
+}
+
+[data-theme="dark"] [class*="bg-[#eceef2]"],
+[data-theme="dark"] [class*="bg-[#f6f7fa]"],
+[data-theme="dark"] [class*="bg-[#e2e5eb]"] {
+  background-color: var(--surface-strong) !important;
+}
+
+[data-theme="dark"] [class*="text-[#111827]"],
+[data-theme="dark"] [class*="text-[#222]"],
+[data-theme="dark"] [class*="text-[#484848]"],
+[data-theme="dark"] [class*="text-[#666]"] {
+  color: var(--foreground) !important;
+}
+
+[data-theme="dark"] [class*="text-[#626883]"],
+[data-theme="dark"] [class*="placeholder:text-[#8f96a3]"]::placeholder {
+  color: var(--muted) !important;
+}
+
+[data-theme="dark"] [class*="border-[#ddd]"],
+[data-theme="dark"] [class*="border-[#d8dbe1]"] {
+  border-color: var(--border) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  color: var(--foreground);
+  background-color: var(--surface);
 }

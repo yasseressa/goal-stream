@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Button } from "@/components/ui/Button";
 import { siteConfig } from "@/config/site";
 import type { Locale, Messages } from "@/i18n";
@@ -74,7 +75,8 @@ export function AdminShell({ children, locale, messages }: { children: React.Rea
       <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-6 lg:grid-cols-[260px_1fr] lg:px-8">
         <aside className="rounded-lg bg-white p-5 text-[#222] shadow-[0_0_4px_rgba(0,0,0,0.3)]">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#931800]">{siteConfig.name}</p>
-          <div className="mt-4">
+          <div className="mt-4 flex items-center gap-2">
+            <ThemeToggle />
             <LanguageSwitcher locale={locale} />
           </div>
           <nav className="mt-8 space-y-2">

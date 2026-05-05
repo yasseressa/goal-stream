@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     gnews_max_results: int = 10
     cache_default_ttl_seconds: int = 300
     cache_redirect_config_ttl_seconds: int = 30
+    redis_url: str = ""
+    redis_key_prefix: str = "melbet-live"
+    cache_stale_ttl_seconds: int = 7 * 24 * 60 * 60
 
     database_host: str = "localhost"
     database_port: int = 5432

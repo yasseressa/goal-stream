@@ -53,6 +53,7 @@ Services:
 - Frontend: `http://localhost:3000`
 - Backend API: `http://localhost:8000`
 - PostgreSQL: `localhost:5432`
+- Redis: `localhost:6379`
 
 ## Run Backend Locally
 
@@ -100,6 +101,7 @@ This repo includes a root `render.yaml` for a free-friendly Render setup with:
    - `FOOTBALL_DATA_BASE_URL=https://v3.football.api-sports.io`
    - `FOOTBALL_DATA_API_KEY=<your API-SPORTS key>`
    - `GNEWS_API_KEY=<your key>`
+   - `REDIS_URL=<your Redis connection URL>` (optional; the backend falls back to in-memory cache when unset)
    - `ADMIN_BOOTSTRAP_USERNAME=<your first admin username>`
    - `ADMIN_BOOTSTRAP_EMAIL=<your first admin email>`
    - `ADMIN_BOOTSTRAP_PASSWORD=<your first admin password>`

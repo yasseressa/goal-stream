@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import type { Locale, Messages } from "@/i18n";
 
 export function Header({ locale, messages }: { locale: Locale; messages: Messages }) {
@@ -31,7 +32,8 @@ export function Header({ locale, messages }: { locale: Locale; messages: Message
             ))}
           </nav>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-2">
+            <ThemeToggle />
             <LanguageSwitcher locale={locale} />
           </div>
         </div>
