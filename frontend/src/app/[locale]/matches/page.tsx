@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 
 import { MatchesPageView } from "@/features/matches/MatchesPageView";
 import { getMessages, isLocale } from "@/i18n";
@@ -7,6 +6,7 @@ import { getHomePageData } from "@/lib/api";
 import type { HomeResponse } from "@/lib/api/types";
 
 export const revalidate = 1800;
+export const dynamic = "force-dynamic";
 
 const emptyHomePageData: HomeResponse = {
   yesterday_matches: [],
@@ -16,8 +16,6 @@ const emptyHomePageData: HomeResponse = {
 };
 
 export default async function MatchesPage({ params }: { params: Promise<{ locale: string }> }) {
-  await connection();
-
   const { locale } = await params;
   if (!isLocale(locale)) {
     notFound();
