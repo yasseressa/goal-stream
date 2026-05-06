@@ -40,5 +40,11 @@ class HomeService:
             return cached
 
         matches = await self.sports_client.get_matches_for_date(target_date, locale)
-        self.cache.set(cache_key, matches, HOME_MATCHES_CACHE_TTL_SECONDS)
+        if matches:
+            self.cache.set(cache_key, matches, HOME_MATCHES_CACHE_TTL_SECONDS)
+        else:
+            logger.warning(
+                "home_matches_empty_not_cached",
+                extra={"locale": locale, "bucket": bucket, "date": target_date.isoformat()},
+            )
         return matches

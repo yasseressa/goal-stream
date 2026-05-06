@@ -75,10 +75,20 @@ class FootballDataSportsAPIClient(SportsAPIClient):
         if not fixtures:
             return []
 
+        allowed_fixtures = [fixture_payload for fixture_payload in fixtures if _is_allowed_league(fixture_payload)]
+        logger.info(
+            "sports_api_fixtures_filtered",
+            extra={
+                "provider": _PROVIDER_NAME,
+                "date": target_date.isoformat(),
+                "raw_fixture_count": len(fixtures),
+                "allowed_fixture_count": len(allowed_fixtures),
+            },
+        )
+
         matches = [
             self._map_match(fixture_payload, locale)
-            for fixture_payload in fixtures
-            if _is_allowed_league(fixture_payload)
+            for fixture_payload in allowed_fixtures
         ]
         unique_matches = {match.external_match_id: match for match in matches}
         return sorted(unique_matches.values(), key=lambda item: item.start_time)
@@ -132,9 +142,25 @@ class FootballDataSportsAPIClient(SportsAPIClient):
         request_date = target_date.isoformat()
         try:
             async with httpx.AsyncClient(base_url=self.base_url, headers=self.headers, timeout=20.0) as client:
-                response = await client.get(_FIXTURES_PATH, params={"date": request_date})
+                response = await client.get(
+                    _FIXTURES_PATH,
+                    params={"date": request_date, "timezone": settings.football_data_timezone},
+                )
             response.raise_for_status()
-            return response.json()
+            payload = response.json()
+            if isinstance(payload, dict):
+                errors = payload.get("errors")
+                results = payload.get("results")
+                if errors:
+                    logger.warning(
+                        "sports_api_response_errors",
+                        extra={"provider": _PROVIDER_NAME, "date": request_date, "errors": errors},
+                    )
+                logger.info(
+                    "sports_api_response_loaded",
+                    extra={"provider": _PROVIDER_NAME, "date": request_date, "results": results},
+                )
+            return payload
         except httpx.HTTPError:
             logger.exception(
                 "sports_api_request_failed",
