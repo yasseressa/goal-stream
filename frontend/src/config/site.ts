@@ -1,11 +1,11 @@
 import type { Locale } from "@/i18n";
 
 export const siteConfig = {
-  name: "Goal Stream",
+  name: "King Live",
   description: "Multilingual football matches and news platform",
-  adminStorageKey: "goal-stream-admin-token",
-  adminExpiresStorageKey: "goal-stream-admin-expires-at",
-  redirectStorageKey: "goal-stream-last-redirect",
+  adminStorageKey: "kinglive-admin-token",
+  adminExpiresStorageKey: "kinglive-admin-expires-at",
+  redirectStorageKey: "kinglive-last-redirect",
   defaultSocialLinks: [
     { label: "Facebook", href: "https://facebook.com" },
     { label: "YouTube", href: "https://youtube.com" },

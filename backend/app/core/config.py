@@ -13,7 +13,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    app_name: str = "Goal Stream API"
+    app_name: str = "King Live API"
     app_env: str = "development"
     app_debug: bool = True
     api_v1_prefix: str = "/api/v1"
@@ -37,14 +37,14 @@ class Settings(BaseSettings):
     cache_default_ttl_seconds: int = 300
     cache_redirect_config_ttl_seconds: int = 30
     redis_url: str = ""
-    redis_key_prefix: str = "melbet-live"
+    redis_key_prefix: str = "kinglive"
     cache_stale_ttl_seconds: int = 7 * 24 * 60 * 60
 
     database_host: str = "localhost"
     database_port: int = 5432
-    database_name: str = "goal_stream"
-    database_user: str = "goal_stream"
-    database_password: str = "goal_stream"
+    database_name: str = "kinglive"
+    database_user: str = "kinglive"
+    database_password: str = "kinglive"
     database_url_override: str | None = Field(default=None, alias="DATABASE_URL")
     sync_database_url_override: str | None = Field(default=None, alias="SYNC_DATABASE_URL")
     cors_allow_origins: str = "http://localhost:3000,http://127.0.0.1:3000"

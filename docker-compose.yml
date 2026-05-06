@@ -2,7 +2,7 @@ services:
   frontend:
     build:
       context: ./frontend
-    container_name: goal_stream_frontend
+    container_name: kinglive_frontend
     env_file:
       - ./frontend/.env.example
     environment:
@@ -18,7 +18,7 @@ services:
   backend:
     build:
       context: ./backend
-    container_name: goal_stream_backend
+    container_name: kinglive_backend
     env_file:
       - ./backend/.env.example
     environment:
@@ -37,24 +37,24 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: goal_stream_redis
+    container_name: kinglive_redis
     ports:
       - "6379:6379"
     restart: unless-stopped
 
   postgres:
     image: postgres:16-alpine
-    container_name: goal_stream_postgres
+    container_name: kinglive_postgres
     environment:
-      POSTGRES_DB: goal_stream
-      POSTGRES_USER: goal_stream
-      POSTGRES_PASSWORD: goal_stream
+      POSTGRES_DB: kinglive
+      POSTGRES_USER: kinglive
+      POSTGRES_PASSWORD: kinglive
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U goal_stream -d goal_stream"]
+      test: ["CMD-SHELL", "pg_isready -U kinglive -d kinglive"]
       interval: 10s
       timeout: 5s
       retries: 5
