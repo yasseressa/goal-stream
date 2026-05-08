@@ -1,5 +1,5 @@
 services:
-  - name: kinglive-api
+  - name: goal-stream-api
     type: web
     runtime: docker
     plan: free
@@ -13,7 +13,7 @@ services:
         value: "false"
       - key: DATABASE_URL
         fromDatabase:
-          name: kinglive-db
+          name: goal-stream-db
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
@@ -26,7 +26,7 @@ services:
       - key: GNEWS_API_KEY
         sync: false
 
-  - name: kinglive-web
+  - name: goal-stream-web
     type: web
     runtime: docker
     plan: free
@@ -37,10 +37,10 @@ services:
       - key: INTERNAL_API_BASE_URL
         fromService:
           type: web
-          name: kinglive-api
+          name: goal-stream-api
           property: hostport
 
 databases:
-  - name: kinglive-db
+  - name: goal-stream-db
     plan: free
-    databaseName: kinglive
+    databaseName: goal_stream

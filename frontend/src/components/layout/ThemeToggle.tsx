@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 type Theme = "light" | "dark";
 
-const storageKey = "kinglive-theme";
+const storageKey = "goal-stream-theme";
 
 export function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");

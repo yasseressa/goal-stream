@@ -5,13 +5,13 @@ import "./globals.css";
 import { defaultLocale, getDirection, isLocale } from "@/i18n";
 
 export const metadata: Metadata = {
-  title: "King Live",
+  title: "Goal Stream",
   description: "Multilingual football matches and news platform",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
-  const cookieLocale = cookieStore.get("kinglive-locale")?.value ?? defaultLocale;
+  const cookieLocale = cookieStore.get("goal-stream-locale")?.value ?? defaultLocale;
   const locale = isLocale(cookieLocale) ? cookieLocale : defaultLocale;
 
   return (
@@ -19,7 +19,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var theme=localStorage.getItem("kinglive-theme");document.documentElement.dataset.theme=theme==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}`,
+            __html: `try{var theme=localStorage.getItem("goal-stream-theme");document.documentElement.dataset.theme=theme==="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}`,
           }}
         />
       </head>
