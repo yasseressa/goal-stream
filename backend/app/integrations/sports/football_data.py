@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from collections import Counter
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
 from threading import RLock
@@ -84,6 +85,7 @@ class FootballDataSportsAPIClient(SportsAPIClient):
             for fixture_payload in fixtures
             if _is_allowed_league(fixture_payload) and _is_fixture_on_date(fixture_payload, target_date)
         ]
+        rejected_leagues = _count_rejected_leagues(fixtures, target_date)
         logger.info(
             "sports_api_fixtures_filtered",
             extra={
@@ -91,6 +93,7 @@ class FootballDataSportsAPIClient(SportsAPIClient):
                 "date": target_date.isoformat(),
                 "raw_fixture_count": len(fixtures),
                 "allowed_fixture_count": len(allowed_fixtures),
+                "rejected_leagues": rejected_leagues,
             },
         )
 
@@ -185,6 +188,7 @@ class FootballDataSportsAPIClient(SportsAPIClient):
                         "sports_api_response_errors",
                         extra={"provider": _PROVIDER_NAME, "date": request_date, "errors": errors},
                     )
+                    return None
                 logger.info(
                     "sports_api_response_loaded",
                     extra={"provider": _PROVIDER_NAME, "date": request_date, "results": results},
@@ -260,6 +264,19 @@ def _is_allowed_league(payload: dict) -> bool:
     if not isinstance(country, str) or not isinstance(league_name, str):
         return False
     return (_normalize_filter_value(country), _normalize_filter_value(league_name)) in _ALLOWED_LEAGUE_FILTERS
+
+
+def _count_rejected_leagues(fixtures: list[dict], target_date: date) -> dict[str, int]:
+    rejected: Counter[str] = Counter()
+    for fixture_payload in fixtures:
+        if not _is_fixture_on_date(fixture_payload, target_date) or _is_allowed_league(fixture_payload):
+            continue
+
+        league = fixture_payload.get("league") or {}
+        country = league.get("country") or "Unknown"
+        league_name = league.get("name") or "Unknown"
+        rejected[f"{country} | {league_name}"] += 1
+    return dict(rejected.most_common(20))
 
 
 def _normalize_filter_value(value: str) -> str:

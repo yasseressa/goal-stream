@@ -1,6 +1,9 @@
 from datetime import UTC, date, datetime
 
+import pytest
+
 from app.core.time import provider_dates_for_sports_date
+from app.integrations.sports import football_data
 from app.integrations.sports.football_data import FootballDataSportsAPIClient, _is_allowed_league, _is_fixture_on_date
 
 
@@ -60,3 +63,32 @@ def test_football_data_requests_provider_dates_around_local_day():
         date(2026, 5, 10),
         date(2026, 5, 11),
     ]
+
+
+@pytest.mark.asyncio
+async def test_football_data_treats_api_sports_errors_as_failed_request(monkeypatch):
+    class FakeResponse:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"errors": {"token": "missing application key"}, "results": 0, "response": []}
+
+    class FakeAsyncClient:
+        def __init__(self, **kwargs):
+            return None
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, traceback):
+            return None
+
+        async def get(self, path, params):
+            return FakeResponse()
+
+    monkeypatch.setattr(football_data.httpx, "AsyncClient", FakeAsyncClient)
+
+    client = FootballDataSportsAPIClient()
+
+    assert await client._fetch_fixtures(date(2026, 5, 10), log_context={}) is None

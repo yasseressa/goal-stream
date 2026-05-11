@@ -77,7 +77,7 @@ export function HomePageView({ locale, messages, data }: { locale: Locale; messa
           {activeBucket.matches.length === 0 ? (
             <DarkEmptyState message={messages.empty} />
           ) : (
-            activeBucket.matches.slice(0, 8).map((match) => (
+            activeBucket.matches.map((match) => (
               <FeatureMatchRow key={match.external_match_id} locale={locale} match={match} messages={messages} now={now} />
             ))
           )}
