@@ -72,10 +72,11 @@ class MatchService:
             ("tomorrow", today + timedelta(days=1)),
         )
         for bucket, target_date in buckets:
-            matches = self.cache.get(CacheKeys.home_matches(locale, bucket))
+            cache_key = CacheKeys.home_matches(locale, bucket, target_date.isoformat())
+            matches = self.cache.get(cache_key)
             if matches is None:
                 matches = await self.sports_client.get_matches_for_date(target_date, locale)
-                self.cache.set(CacheKeys.home_matches(locale, bucket), matches, HOME_MATCHES_CACHE_TTL_SECONDS)
+                self.cache.set(cache_key, matches, HOME_MATCHES_CACHE_TTL_SECONDS)
             for match in matches:
                 if match.external_match_id == match_id:
                     return match

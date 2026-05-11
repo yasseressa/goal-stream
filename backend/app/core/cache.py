@@ -199,8 +199,9 @@ def create_cache_backend() -> CacheBackend:
 
 class CacheKeys:
     @staticmethod
-    def home_matches(locale: str, bucket: str) -> str:
-        return f"home:matches:{locale}:{bucket}"
+    def home_matches(locale: str, bucket: str, match_date: str | None = None) -> str:
+        suffix = f":{match_date}" if match_date else ""
+        return f"home:matches:{locale}:{bucket}{suffix}"
 
     @staticmethod
     def home_news(locale: str) -> str:

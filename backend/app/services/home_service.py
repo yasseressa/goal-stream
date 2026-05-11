@@ -35,7 +35,7 @@ class HomeService:
         }
 
     async def _get_matches_for_bucket(self, target_date, locale: str, bucket: str) -> list[MatchData]:
-        cache_key = CacheKeys.home_matches(locale, bucket)
+        cache_key = CacheKeys.home_matches(locale, bucket, target_date.isoformat())
         cached = self.cache.get(cache_key)
         if cached is not None:
             return cached

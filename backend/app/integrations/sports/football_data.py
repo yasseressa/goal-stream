@@ -9,7 +9,7 @@ import httpx
 
 from app.core.constants import HOME_MATCHES_CACHE_TTL_SECONDS
 from app.core.config import settings
-from app.core.time import is_on_sports_date, utc_dates_for_sports_date
+from app.core.time import is_on_sports_date, provider_dates_for_sports_date
 from app.integrations.shared_models import MatchData
 from app.integrations.sports.client import SportsAPIClient
 from app.integrations.sports.localization import localize_sports_text
@@ -27,6 +27,9 @@ _ALLOWED_LEAGUE_FILTERS = {
     ("england", "premier league"),
     ("france", "ligue 1"),
     ("spain", "la liga"),
+    ("spain", "laliga"),
+    ("spain", "la liga ea sports"),
+    ("spain", "primera division"),
     ("germany", "bundesliga"),
     ("italy", "serie a"),
     ("portugal", "primeira liga"),
@@ -118,7 +121,7 @@ class FootballDataSportsAPIClient(SportsAPIClient):
 
         fixtures: list[dict] = []
         had_failed_request = False
-        for request_date in utc_dates_for_sports_date(target_date):
+        for request_date in provider_dates_for_sports_date(target_date):
             payload = await self._fetch_fixtures(request_date, log_context={"date": cache_key})
             request_fixtures = _extract_fixtures(payload) if payload is not None else None
             if request_fixtures is None:

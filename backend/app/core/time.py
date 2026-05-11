@@ -31,6 +31,16 @@ def utc_dates_for_sports_date(target_date: date) -> list[date]:
     return dates
 
 
+def provider_dates_for_sports_date(target_date: date) -> list[date]:
+    dates = {
+        target_date - timedelta(days=1),
+        target_date,
+        target_date + timedelta(days=1),
+        *utc_dates_for_sports_date(target_date),
+    }
+    return sorted(dates)
+
+
 def is_on_sports_date(value: datetime, target_date: date) -> bool:
     if value.tzinfo is None:
         value = value.replace(tzinfo=UTC)

@@ -1,6 +1,6 @@
 from datetime import UTC, date, datetime
 
-from app.core.time import utc_dates_for_sports_date
+from app.core.time import provider_dates_for_sports_date
 from app.integrations.sports.football_data import FootballDataSportsAPIClient, _is_allowed_league, _is_fixture_on_date
 
 
@@ -54,5 +54,9 @@ def test_football_data_keeps_matches_by_configured_local_date():
     assert not _is_fixture_on_date(payload, date(2026, 5, 9))
 
 
-def test_football_data_requests_utc_dates_that_cover_local_day():
-    assert utc_dates_for_sports_date(date(2026, 5, 10)) == [date(2026, 5, 9), date(2026, 5, 10)]
+def test_football_data_requests_provider_dates_around_local_day():
+    assert provider_dates_for_sports_date(date(2026, 5, 10)) == [
+        date(2026, 5, 9),
+        date(2026, 5, 10),
+        date(2026, 5, 11),
+    ]
