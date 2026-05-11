@@ -1,6 +1,7 @@
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
-from app.integrations.sports.football_data import FootballDataSportsAPIClient, _is_allowed_league
+from app.core.time import utc_dates_for_sports_date
+from app.integrations.sports.football_data import FootballDataSportsAPIClient, _is_allowed_league, _is_fixture_on_date
 
 
 def test_football_data_maps_api_sports_fixture_to_match_data():
@@ -44,3 +45,14 @@ def test_football_data_filters_allowed_leagues():
     assert _is_allowed_league({"league": {"country": "UEFA Europa League", "name": "World"}})
     assert not _is_allowed_league({"league": {"country": "Chile", "name": "Primera B"}})
     assert not _is_allowed_league({"league": {"country": "Belgium", "name": "Pro League"}})
+
+
+def test_football_data_keeps_matches_by_configured_local_date():
+    payload = {"fixture": {"id": 1, "date": "2026-05-09T22:30:00+00:00"}}
+
+    assert _is_fixture_on_date(payload, date(2026, 5, 10))
+    assert not _is_fixture_on_date(payload, date(2026, 5, 9))
+
+
+def test_football_data_requests_utc_dates_that_cover_local_day():
+    assert utc_dates_for_sports_date(date(2026, 5, 10)) == [date(2026, 5, 9), date(2026, 5, 10)]

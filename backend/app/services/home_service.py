@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from app.core.cache import CacheBackend, CacheKeys
 from app.core.constants import HOME_MATCHES_CACHE_TTL_SECONDS
+from app.core.time import current_sports_date
 from app.integrations.shared_models import MatchData, NewsArticleData
 from app.integrations.sports.client import SportsAPIClient
 from app.services.news_service import NewsService
@@ -19,7 +20,7 @@ class HomeService:
         self.cache = cache
 
     async def get_home_data(self, locale: str) -> dict[str, list[MatchData] | list[NewsArticleData]]:
-        today = datetime.now().date()
+        today = current_sports_date()
         yesterday_matches = await self._get_matches_for_bucket(today - timedelta(days=1), locale, "yesterday")
         today_matches = await self._get_matches_for_bucket(today, locale, "today")
         tomorrow_matches = await self._get_matches_for_bucket(today + timedelta(days=1), locale, "tomorrow")

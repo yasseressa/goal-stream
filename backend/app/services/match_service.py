@@ -1,19 +1,22 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.cache import CacheBackend, CacheKeys
 from app.core.constants import HOME_MATCHES_CACHE_TTL_SECONDS, MATCH_DETAILS_CACHE_TTL_SECONDS
+from app.core.time import current_sports_date, is_on_sports_date, sports_timezone
 from app.integrations.shared_models import MatchData, NewsArticleData
 from app.integrations.sports.client import SportsAPIClient
 from app.repositories.stream_link import StreamLinkRepository
 from app.services.news_service import NewsService
 
 logger = logging.getLogger(__name__)
+SPORTS_TIMEZONE = sports_timezone()
+KSA_TIMEZONE = SPORTS_TIMEZONE
 
 
 class MatchService:
@@ -58,10 +61,11 @@ class MatchService:
             stream_link is not None
             and stream_link.show_stream
             and stream_link.stream_url
+            and is_on_sports_date(match.start_time, current_sports_date())
         )
 
     async def _find_match_from_home_buckets(self, match_id: str, locale: str) -> MatchData | None:
-        today = datetime.now().date()
+        today = current_sports_date()
         buckets = (
             ("yesterday", today - timedelta(days=1)),
             ("today", today),

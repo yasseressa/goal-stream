@@ -9,6 +9,7 @@ import httpx
 
 from app.core.constants import HOME_MATCHES_CACHE_TTL_SECONDS
 from app.core.config import settings
+from app.core.time import is_on_sports_date, utc_dates_for_sports_date
 from app.integrations.shared_models import MatchData
 from app.integrations.sports.client import SportsAPIClient
 from app.integrations.sports.localization import localize_sports_text
@@ -75,7 +76,11 @@ class FootballDataSportsAPIClient(SportsAPIClient):
         if not fixtures:
             return []
 
-        allowed_fixtures = [fixture_payload for fixture_payload in fixtures if _is_allowed_league(fixture_payload)]
+        allowed_fixtures = [
+            fixture_payload
+            for fixture_payload in fixtures
+            if _is_allowed_league(fixture_payload) and _is_fixture_on_date(fixture_payload, target_date)
+        ]
         logger.info(
             "sports_api_fixtures_filtered",
             extra={
@@ -111,14 +116,29 @@ class FootballDataSportsAPIClient(SportsAPIClient):
         if cached is not None:
             return cached
 
-        payload = await self._fetch_fixtures(target_date, log_context={"date": cache_key})
-        fixtures = _extract_fixtures(payload) if payload is not None else None
-        if fixtures is None:
+        fixtures: list[dict] = []
+        had_failed_request = False
+        for request_date in utc_dates_for_sports_date(target_date):
+            payload = await self._fetch_fixtures(request_date, log_context={"date": cache_key})
+            request_fixtures = _extract_fixtures(payload) if payload is not None else None
+            if request_fixtures is None:
+                had_failed_request = True
+                continue
+            fixtures.extend(request_fixtures)
+
+        if had_failed_request and not fixtures:
             stale = self._get_cached_fixtures(cache_key, allow_stale=True)
             return stale or []
 
-        if fixtures:
+        fixtures = _dedupe_fixtures(fixtures)
+
+        if fixtures and not had_failed_request:
             self._set_cached_fixtures(cache_key, fixtures)
+        elif fixtures:
+            logger.warning(
+                "sports_api_partial_fixtures_not_cached",
+                extra={"provider": _PROVIDER_NAME, "date": cache_key},
+            )
         else:
             logger.warning(
                 "sports_api_empty_fixtures_not_cached",
@@ -213,6 +233,21 @@ def _extract_fixtures(payload: dict | list) -> list[dict]:
         return [item for item in fixtures if isinstance(item, dict)]
 
     return []
+
+
+def _dedupe_fixtures(fixtures: list[dict]) -> list[dict]:
+    unique: dict[str, dict] = {}
+    for fixture_payload in fixtures:
+        fixture = fixture_payload.get("fixture") or {}
+        fixture_id = fixture.get("id")
+        key = str(fixture_id) if fixture_id is not None else str(id(fixture_payload))
+        unique[key] = fixture_payload
+    return list(unique.values())
+
+
+def _is_fixture_on_date(payload: dict, target_date: date) -> bool:
+    fixture = payload.get("fixture") or {}
+    return is_on_sports_date(_parse_datetime(fixture), target_date)
 
 
 def _is_allowed_league(payload: dict) -> bool:
