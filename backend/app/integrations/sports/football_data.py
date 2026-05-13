@@ -28,6 +28,8 @@ _ALLOWED_LEAGUE_FILTERS = {
     ("ESP", "la liga"),
     ("GER", "bundesliga"),
     ("ITA", "serie a"),
+    ("ITA", "coppa italia"),
+    ("ITA", "cup"),
     ("FRA", "ligue 1"),
     ("POR", "primeira liga"),
     ("NED", "eredivisie"),
@@ -62,6 +64,8 @@ _COUNTRY_BY_CCODE = {
     "EUR": "World",
     "WRL": "World",
 }
+_TEAM_LOGO_URL = "https://images.fotmob.com/image_resources/logo/teamlogo/{team_id}.png"
+_LEAGUE_LOGO_URL = "https://images.fotmob.com/image_resources/logo/leaguelogo/{league_id}.png"
 
 
 @dataclass(slots=True)
@@ -303,9 +307,9 @@ class FootballDataSportsAPIClient(SportsAPIClient):
             description=description,
             home_score=_pick_score(home_team),
             away_score=_pick_score(away_team),
-            home_team_crest=home_team.get("logo"),
-            away_team_crest=away_team.get("logo"),
-            competition_emblem=league.get("logo"),
+            home_team_crest=_team_logo_url(home_team),
+            away_team_crest=_team_logo_url(away_team),
+            competition_emblem=_league_logo_url(league),
         )
 
 
@@ -419,6 +423,20 @@ def _parse_datetime(fixture: dict) -> datetime:
 
 def _pick_team_name(team_payload: dict) -> str | None:
     return team_payload.get("longName") or team_payload.get("name")
+
+
+def _team_logo_url(team_payload: dict) -> str | None:
+    team_id = team_payload.get("id")
+    if team_id is None:
+        return None
+    return _TEAM_LOGO_URL.format(team_id=team_id)
+
+
+def _league_logo_url(league_payload: dict) -> str | None:
+    league_id = league_payload.get("id") or league_payload.get("primaryId")
+    if league_id is None:
+        return None
+    return _LEAGUE_LOGO_URL.format(league_id=league_id)
 
 
 def _pick_score(team_payload: dict) -> int | None:

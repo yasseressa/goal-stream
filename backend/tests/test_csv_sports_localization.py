@@ -16,6 +16,7 @@ def test_localize_sports_text_uses_country_context_for_ambiguous_leagues():
     assert localize_sports_text("Premier League", "ar", entity_type="league", country="Egypt") == "الدوري المصري الدرجة الأولى"
     assert localize_sports_text("Premier League", "ar", entity_type="league", country="England") == "الدوري الإنجليزي الممتاز"
     assert localize_sports_text("LaLiga", "ar", entity_type="league", country="Spain") == "الدوري الإسباني الدرجة الأولى"
+    assert localize_sports_text("Coppa Italia", "ar", entity_type="league", country="Italy") == "كأس إيطاليا"
 
 
 def test_localize_sports_text_uses_csv_for_modern_sport():

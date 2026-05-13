@@ -8,15 +8,15 @@ export function MatchPreviewArticle({ locale, match, messages }: { locale: Local
   const copy = buildPreviewCopy(locale, match, messages, status);
 
   return (
-    <Card className="mx-auto w-full max-w-[900px] overflow-hidden border border-[#d8dbe1] bg-white shadow-[0_0_4px_rgba(0,0,0,0.12)]">
-      <div className="border-b border-[#eceef2] bg-[#f7f8fb] p-4 min-[420px]:p-6">
+    <Card className="mx-auto w-full max-w-[900px] overflow-hidden border border-[var(--border)] bg-[var(--surface)] shadow-[0_0_4px_rgba(0,0,0,0.12)]">
+      <div className="border-b border-[var(--border)] bg-[var(--surface-strong)] p-4 min-[420px]:p-6">
         <p className="text-[0.68rem] font-bold uppercase tracking-[0.22em] text-[#931800]">{copy.eyebrow}</p>
-        <h2 className="mt-3 text-2xl font-bold leading-tight text-[#222] min-[420px]:text-3xl">{copy.title}</h2>
-        <p className="mt-3 text-sm leading-6 text-[#626883] min-[420px]:text-base">{copy.summary}</p>
+        <h2 className="mt-3 text-2xl font-bold leading-tight text-[var(--foreground)] min-[420px]:text-3xl">{copy.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-[var(--muted)] min-[420px]:text-base">{copy.summary}</p>
       </div>
 
       <div className="grid gap-4 p-4 min-[420px]:p-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <article className="space-y-4 text-sm leading-7 text-[#484848] min-[420px]:text-base min-[420px]:leading-8">
+        <article className="space-y-4 text-sm leading-7 text-[var(--foreground)] min-[420px]:text-base min-[420px]:leading-8">
           {copy.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
@@ -24,15 +24,15 @@ export function MatchPreviewArticle({ locale, match, messages }: { locale: Local
 
         <aside className="space-y-3">
           {copy.details.map((detail) => (
-            <div key={detail.label} className="rounded-xl bg-[#f4f5f8] p-4">
-              <p className="text-xs font-bold text-[#626883]">{detail.label}</p>
-              <p className="mt-1 text-base font-bold text-[#222]">{detail.value}</p>
+            <div key={detail.label} className="rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] p-4">
+              <p className="text-xs font-bold text-[var(--muted)]">{detail.label}</p>
+              <p className="mt-1 text-base font-bold text-[var(--foreground)]">{detail.value}</p>
             </div>
           ))}
         </aside>
       </div>
 
-      <div className="border-t border-[#eceef2] bg-[#fff7f5] p-4 text-sm font-semibold text-[#931800] min-[420px]:p-5">
+      <div className="border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--main-color)_9%,var(--surface))] p-4 text-sm font-semibold text-[#931800] min-[420px]:p-5">
         {copy.note}
       </div>
     </Card>

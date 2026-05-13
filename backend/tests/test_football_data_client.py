@@ -37,15 +37,16 @@ def test_football_data_maps_rapidapi_fixture_to_match_data():
     assert match.status == "live"
     assert match.start_time == datetime(2026, 5, 13, 19, 0, tzinfo=UTC)
     assert match.venue is None
-    assert match.home_team_crest is None
-    assert match.away_team_crest is None
-    assert match.competition_emblem is None
+    assert match.home_team_crest == "https://images.fotmob.com/image_resources/logo/teamlogo/8456.png"
+    assert match.away_team_crest == "https://images.fotmob.com/image_resources/logo/teamlogo/9826.png"
+    assert match.competition_emblem == "https://images.fotmob.com/image_resources/logo/leaguelogo/47.png"
 
 
 def test_football_data_filters_allowed_leagues():
     assert _is_allowed_league({"league": {"ccode": "INT", "name": "UEFA Champions League"}})
     assert _is_allowed_league({"league": {"ccode": "ESP", "name": "LaLiga"}})
     assert _is_allowed_league({"league": {"ccode": "EGY", "name": "Premier League"}})
+    assert _is_allowed_league({"league": {"ccode": "ITA", "name": "Coppa Italia"}})
     assert not _is_allowed_league({"league": {"ccode": "CHI", "name": "Primera B"}})
     assert not _is_allowed_league({"league": {"ccode": "BEL", "name": "Pro League"}})
 
