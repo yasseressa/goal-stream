@@ -8,8 +8,8 @@ def test_localize_sports_text_uses_csv_for_supported_locales():
 
 
 def test_localize_sports_text_matches_names_with_common_prefixes():
-    assert localize_sports_text("FC Arsenal", "ar") == "أرسنال"
-    assert localize_sports_text("Arsenal FC", "fr") == "Arsenal"
+    assert localize_sports_text("FC Arsenal", "ar", entity_type="team") == "أرسنال"
+    assert localize_sports_text("Arsenal FC", "fr", entity_type="team") == "Arsenal"
 
 
 def test_localize_sports_text_uses_country_context_for_ambiguous_leagues():
