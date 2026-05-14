@@ -92,5 +92,12 @@
   "footerTagline": "Una experiencia futbolística inspirada en la transmisión en vivo, diseñada para acceso rápido a los partidos y lectura clara en todas las pantallas.",
   "matchesIntro": "Elige el día que prefieras y abre directamente la página del partido en una pestaña nueva con un solo clic.",
   "newsIntro": "Las últimas noticias deportivas se muestran de forma clara con enlaces directos a cada artículo.",
+  "fixturesCacheTitle": "Caché API de partidos",
+  "fixturesCacheDescription": "Actualiza manualmente los partidos de ayer, hoy y mañana. Úsalo solo si necesitas datos nuevos antes de la actualización programada de las 00:00 o 12:00.",
+  "refreshFixturesCacheAction": "Actualizar ahora",
+  "fixturesCacheConfirmTitle": "¿Actualizar la caché de partidos?",
+  "fixturesCacheConfirmMessage": "Esto pedirá datos nuevos a la API y reemplazará la caché JSON local de los días visibles.",
+  "fixturesCacheRefreshSuccess": "La caché de partidos se actualizó correctamente. Partidos sin filtrar: {count}.",
+  "cancelAction": "Cancelar",
   "contactIntro": "Contáctanos a través de los siguientes enlaces. Cada opción se abrirá en una nueva pestaña para un acceso rápido."
 }

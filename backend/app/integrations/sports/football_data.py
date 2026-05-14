@@ -5,7 +5,7 @@ import json
 import os
 from collections import Counter
 from dataclasses import dataclass
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from threading import RLock
 
@@ -111,6 +111,30 @@ class FootballDataSportsAPIClient(SportsAPIClient):
         # The free API-SPORTS plan is protected by a daily request limit. Match details are resolved from
         # cached home buckets in MatchService, so no separate detail request is needed.
         return None
+
+    async def refresh_fixture_cache(self, target_date: date | None = None) -> dict[str, int | list[str]]:
+        """Force-refresh the JSON provider cache for the visible match buckets."""
+        sports_date = target_date or datetime.now(sports_timezone()).date()
+        target_dates = [sports_date - timedelta(days=1), sports_date, sports_date + timedelta(days=1)]
+        self.clear_fixture_cache()
+
+        refreshed_dates: set[str] = set()
+        total_matches = 0
+        for bucket_date in target_dates:
+            fixtures = await self._get_fixtures_for_date(bucket_date)
+            total_matches += len(fixtures)
+            refreshed_dates.update(request_date.isoformat() for request_date in provider_dates_for_sports_date(bucket_date))
+
+        return {
+            "target_dates": [item.isoformat() for item in target_dates],
+            "provider_dates": sorted(refreshed_dates),
+            "raw_match_count": total_matches,
+        }
+
+    def clear_fixture_cache(self) -> None:
+        with self._cache_lock:
+            self._fixtures_cache.clear()
+            self._write_fixture_cache(_empty_fixture_cache())
 
     async def _get_fixtures_for_date(self, target_date: date) -> list[dict]:
         cache_key = target_date.isoformat()

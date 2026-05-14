@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.routes.admin_fixtures_cache import router as admin_fixtures_cache_router
 from app.api.routes.admin_redirect_settings import router as admin_redirect_settings_router
 from app.api.routes.admin_redirects import router as admin_redirects_router
 from app.api.routes.admin_streams import router as admin_streams_router
@@ -17,6 +18,7 @@ api_router.include_router(matches_router, tags=["public"])
 api_router.include_router(news_router, tags=["public"])
 api_router.include_router(redirect_router, tags=["public"])
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
+api_router.include_router(admin_fixtures_cache_router, tags=["admin"])
 api_router.include_router(admin_streams_router, tags=["admin"])
 api_router.include_router(admin_redirects_router, tags=["admin"])
 api_router.include_router(admin_redirect_settings_router, tags=["admin"])

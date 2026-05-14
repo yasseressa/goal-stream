@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Card } from "@/components/ui/Card";
 import type { Locale, Messages } from "@/i18n";
+import { FixtureCacheRefreshCard } from "@/features/admin/FixtureCacheRefreshCard";
 
 export function AdminDashboard({ locale, messages }: { locale: Locale; messages: Messages }) {
   return (
@@ -32,6 +33,7 @@ export function AdminDashboard({ locale, messages }: { locale: Locale; messages:
             {messages.socialLinks}
           </Link>
         </Card>
+        <FixtureCacheRefreshCard messages={messages} />
       </div>
     </div>
   );

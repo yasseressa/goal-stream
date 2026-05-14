@@ -92,5 +92,12 @@
   "footerTagline": "A broadcast-inspired football experience built for fast match access, strong contrast, and smooth reading on every screen.",
   "matchesIntro": "Choose the day that suits you, then open the match page directly in a new tab with one click.",
   "newsIntro": "The latest sports stories are presented in a clear layout with direct links to each article.",
+  "fixturesCacheTitle": "Matches API Cache",
+  "fixturesCacheDescription": "Manually refresh yesterday, today, and tomorrow fixtures. Use this only when you need fresh API data before the scheduled 00:00 or 12:00 refresh.",
+  "refreshFixturesCacheAction": "Refresh matches now",
+  "fixturesCacheConfirmTitle": "Refresh matches cache?",
+  "fixturesCacheConfirmMessage": "This will request fresh fixtures from the API and replace the local JSON cache for visible match days.",
+  "fixturesCacheRefreshSuccess": "Matches cache refreshed successfully. Raw matches: {count}.",
+  "cancelAction": "Cancel",
   "contactIntro": "Reach us through the links below. Every contact method opens in a new tab for faster access."
 }

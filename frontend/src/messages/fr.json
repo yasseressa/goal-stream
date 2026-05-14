@@ -92,5 +92,12 @@
   "footerTagline": "Une expérience football inspirée du direct, conçue pour un accès rapide aux matchs et une lecture claire sur tous les écrans.",
   "matchesIntro": "Choisissez le jour qui vous convient puis ouvrez directement la page du match dans un nouvel onglet d'un simple clic.",
   "newsIntro": "Les dernières actualités sportives sont affichées dans un format clair avec des liens directs vers chaque article.",
+  "fixturesCacheTitle": "Cache API des matchs",
+  "fixturesCacheDescription": "Actualisez manuellement les matchs d'hier, d'aujourd'hui et de demain. À utiliser seulement si vous avez besoin de données API fraîches avant l'actualisation planifiée à 00:00 ou 12:00.",
+  "refreshFixturesCacheAction": "Actualiser maintenant",
+  "fixturesCacheConfirmTitle": "Actualiser le cache des matchs ?",
+  "fixturesCacheConfirmMessage": "Cela demandera de nouvelles données à l'API et remplacera le cache JSON local pour les jours de matchs visibles.",
+  "fixturesCacheRefreshSuccess": "Le cache des matchs a été actualisé avec succès. Matchs bruts : {count}.",
+  "cancelAction": "Annuler",
   "contactIntro": "Contactez-nous via les liens ci-dessous. Chaque moyen de contact s'ouvre dans un nouvel onglet pour un accès rapide."
 }

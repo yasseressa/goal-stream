@@ -1,6 +1,7 @@
 import { apiRequest } from "@/lib/api/client";
 import type {
   HomeResponse,
+  FixtureCacheRefreshResponse,
   LoginPayload,
   LoginResponse,
   MatchDetails,
@@ -114,5 +115,13 @@ export function updateRedirectSettings(payload: RedirectSettings, token: string)
     method: "PUT",
     body: JSON.stringify(payload),
     token,
+  });
+}
+
+export function refreshFixturesCache(token: string) {
+  return apiRequest<FixtureCacheRefreshResponse>("/api/v1/admin/fixtures-cache/refresh", {
+    method: "POST",
+    token,
+    timeoutMs: 90000,
   });
 }

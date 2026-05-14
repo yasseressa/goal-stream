@@ -123,3 +123,10 @@ export interface SocialLink {
 export interface SocialLinksResponse {
   items: SocialLink[];
 }
+
+export interface FixtureCacheRefreshResponse {
+  status: "refreshed";
+  target_dates: string[];
+  provider_dates: string[];
+  raw_match_count: number;
+}

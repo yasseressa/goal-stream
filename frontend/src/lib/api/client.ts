@@ -10,12 +10,13 @@ interface RequestOptions extends RequestInit {
   token?: string | null;
   cacheTags?: string[];
   revalidateSeconds?: number;
+  timeoutMs?: number;
 }
 
 const REQUEST_TIMEOUT_MS = 15000;
 
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { token, headers, cacheTags, revalidateSeconds, ...rest } = options;
+  const { token, headers, cacheTags, revalidateSeconds, timeoutMs = REQUEST_TIMEOUT_MS, ...rest } = options;
   const requestUrl = `${getApiBaseUrl()}${path}`;
   const isSafeMethod = (rest.method ?? "GET").toUpperCase() === "GET";
   const maxAttempts = isSafeMethod ? 3 : 1;
@@ -25,7 +26,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
     let response: Response;
 
     try {
