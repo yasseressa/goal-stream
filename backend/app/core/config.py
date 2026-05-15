@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -50,6 +51,8 @@ class Settings(BaseSettings):
     admin_bootstrap_password: str | None = None
 
     def _normalize_database_url(self, url: str, driver: str) -> str:
+        url = self._normalize_asyncpg_ssl_query(url) if driver == "asyncpg" else url
+
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql://", 1)
 
@@ -61,6 +64,17 @@ class Settings(BaseSettings):
             return url.replace("postgresql://", f"postgresql+{driver}://", 1)
 
         return url
+
+    def _normalize_asyncpg_ssl_query(self, url: str) -> str:
+        parsed = urlsplit(url)
+        query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+        sslmode = query.pop("sslmode", "").lower()
+        query.pop("channel_binding", None)
+
+        if sslmode and sslmode not in {"disable", "allow", "prefer"}:
+            query.setdefault("ssl", "true")
+
+        return urlunsplit((parsed.scheme, parsed.netloc, parsed.path, urlencode(query), parsed.fragment))
 
     @computed_field
     @property
