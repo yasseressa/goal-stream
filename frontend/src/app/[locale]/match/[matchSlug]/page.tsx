@@ -1,1 +1,1 @@
-export { default } from "../../matches/[matchSlug]/page";
+export { default, generateMetadata, revalidate } from "../../matches/[matchSlug]/page";

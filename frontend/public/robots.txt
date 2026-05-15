@@ -1,2 +1,9 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /ar/admin
+Disallow: /en/admin
+Disallow: /fr/admin
+Disallow: /es/admin
+
+Sitemap: https://goalstream.stream/sitemap.xml

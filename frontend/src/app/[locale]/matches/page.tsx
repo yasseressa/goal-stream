@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { MatchesPageView } from "@/features/matches/MatchesPageView";
 import { getMessages, isLocale } from "@/i18n";
 import { getHomePageData } from "@/lib/api";
 import type { HomeResponse } from "@/lib/api/types";
+import { matchesPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -14,6 +16,15 @@ const emptyHomePageData: HomeResponse = {
   tomorrow_matches: [],
   latest_news: [],
 };
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) {
+    return {};
+  }
+
+  return matchesPageMetadata(locale);
+}
 
 export default async function MatchesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

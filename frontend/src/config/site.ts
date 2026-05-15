@@ -2,7 +2,7 @@ import type { Locale } from "@/i18n";
 
 export const siteConfig = {
   name: "Goal Stream",
-  description: "Multilingual football matches and news platform",
+  description: "Live football fixtures, match streams, schedules, scores, and sports news.",
   adminStorageKey: "goal-stream-admin-token",
   adminExpiresStorageKey: "goal-stream-admin-expires-at",
   redirectStorageKey: "goal-stream-last-redirect",

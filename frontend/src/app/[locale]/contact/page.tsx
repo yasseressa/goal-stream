@@ -1,10 +1,21 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { siteConfig } from "@/config/site";
 import { getMessages, isLocale } from "@/i18n";
 import { getSocialLinks } from "@/lib/api";
 import type { SocialLink } from "@/lib/api/types";
+import { contactPageMetadata } from "@/lib/seo";
 import { notFound } from "next/navigation";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  if (!isLocale(locale)) {
+    return {};
+  }
+
+  return contactPageMetadata(locale);
+}
 
 export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

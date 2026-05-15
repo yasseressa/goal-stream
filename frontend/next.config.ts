@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 function normalizeInternalApiBaseUrl(value?: string) {
   if (!value) {
@@ -10,6 +12,7 @@ function normalizeInternalApiBaseUrl(value?: string) {
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  outputFileTracingRoot: dirname(fileURLToPath(import.meta.url)),
   reactStrictMode: true,
   async rewrites() {
     const internalApiBaseUrl = normalizeInternalApiBaseUrl(process.env.INTERNAL_API_BASE_URL);
