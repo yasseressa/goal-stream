@@ -32,14 +32,18 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
     }
 
     const handleClick = async (event: MouseEvent) => {
+      const shouldPrepareNewTab = configRef.current?.open_in_new_tab !== false;
+      const redirectTab = shouldPrepareNewTab ? window.open("about:blank", "_blank", "noopener,noreferrer") : null;
       const config = await refreshRedirectConfig();
       if (!config?.enabled || !config.target_url) {
+        redirectTab?.close();
         return;
       }
 
       const now = Date.now();
       const lastRedirect = Number(window.localStorage.getItem(siteConfig.redirectStorageKey) || 0);
       if (now - lastRedirect < config.interval_seconds * 1000) {
+        redirectTab?.close();
         return;
       }
 
@@ -47,8 +51,13 @@ export function GlobalClickRedirectProvider({ children }: { children: React.Reac
       event.preventDefault();
       event.stopPropagation();
       if (config.open_in_new_tab) {
-        window.open(config.target_url, "_blank", "noopener,noreferrer");
+        if (redirectTab) {
+          redirectTab.location.href = config.target_url;
+        } else {
+          window.open(config.target_url, "_blank", "noopener,noreferrer");
+        }
       } else {
+        redirectTab?.close();
         window.location.href = config.target_url;
       }
     };
